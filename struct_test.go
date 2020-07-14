@@ -2,6 +2,7 @@ package pack_test
 
 import (
 	"reflect"
+	"testing/quick"
 
 	"github.com/renproject/pack"
 	"github.com/renproject/pack/packutil"
@@ -84,9 +85,24 @@ var _ = Describe("Struct", func() {
 
 	Context("when getting type information", func() {
 		It("should return the struct type", func() {
-			s := pack.NewStruct("foo", pack.NewU64(32))
-			t := s.Type()
-			Expect(t.Kind()).To(Equal(pack.KindStruct))
+			f := func(x pack.Struct) bool {
+				Expect(x.Type().Kind()).To(Equal(pack.KindStruct))
+				return true
+			}
+			Expect(quick.Check(f, nil)).To(Succeed())
+		})
+	})
+
+	Context("when stringifying a struct", func() {
+		It("should equal the JSON representation", func() {
+			f := func(x pack.Struct) bool {
+				stringified := x.String()
+				data, err := x.MarshalJSON()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(stringified).To(Equal(string(data)))
+				return true
+			}
+			Expect(quick.Check(f, nil)).To(Succeed())
 		})
 	})
 })

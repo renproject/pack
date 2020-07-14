@@ -129,6 +129,15 @@ func (typed *Typed) Unmarshal(buf []byte, rem int) ([]byte, int, error) {
 	return buf, rem, nil
 }
 
+// String returns the struct in its JSON representation.
+func (typed Typed) String() string {
+	data, err := typed.MarshalJSON()
+	if err != nil {
+		return fmt.Sprintf(`{"error": %v}`, err)
+	}
+	return string(data)
+}
+
 // Generate a random well-typed struct. This method is implemented for use in
 // quick tests. See https://golang.org/pkg/testing/quick/#Generator for more
 // information. Generated typed values will never contain embedded structs.

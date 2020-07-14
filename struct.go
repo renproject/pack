@@ -143,6 +143,15 @@ func (v Struct) MarshalJSON() ([]byte, error) {
 	return json.Marshal(raw)
 }
 
+// String returns the struct in its JSON representation.
+func (v Struct) String() string {
+	data, err := v.MarshalJSON()
+	if err != nil {
+		return fmt.Sprintf(`{"error": %v}`, err)
+	}
+	return string(data)
+}
+
 // Generate a random struct field. This method is implemented for use in quick
 // tests. See https://golang.org/pkg/testing/quick/#Generator for more
 // information. Generated structs will never contain embedded structs.
