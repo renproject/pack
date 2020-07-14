@@ -19,11 +19,19 @@ In distributed systems, message passing often requires marshaling/unmarshaling m
 The primary interface for working with `📦 pack` is the `Value` interface. All values implement this interface, allowing them to be marshaling to binary and JSON, and to expose their type information.
 
 ```go
-point := pack.NewStruct(
-    "x", pack.NewU64(42),
-    "y", pack.NewU64(100),
+import (
+    "fmt"
+
+    "github.com/renproject/pack"
 )
-fmt.Printf("type: %v", point.Type())
+
+func main() {
+    point := pack.NewStruct(
+        "x", pack.NewU64(42),
+        "y", pack.NewU64(100),
+    )
+    fmt.Printf("type: %v", point.Type())
+}
 ```
 
 ## Types
@@ -31,27 +39,45 @@ fmt.Printf("type: %v", point.Type())
 By default, values do not marshal their types. This means that values cannot be unmarshalled, because there it is not always possible to know what type you are looking at without additional context. Consider the following examples:
 
 ```go
-x := pack.NewU64(1)
-xData, _ := surge.ToBinary(x)
+import (
+    "fmt"
 
-y := pack.NewString("1")
-yData, _ := surge.ToBinary(x)
+    "github.com/renproject/pack"
+    "github.com/renproject/surge"
+)
 
-fmt.Printf("x: %v", pack.Bytes(xData))
-fmt.Printf("y: %v", pack.Bytes(yData))
+func main() {
+    x := pack.NewU64(1)
+    xData, _ := surge.ToBinary(x)
+
+    y := pack.NewString("1")
+    yData, _ := surge.ToBinary(x)
+
+    fmt.Printf("x: %v", pack.Bytes(xData))
+    fmt.Printf("y: %v", pack.Bytes(yData))
+}
 ```
 
 Looking only at the binary representation of the values, it is impossible to distingish between the types of these values when unmarshalling. This presents a common problem in distributed systems: how do my services tell each other about the type context? Well, with `📦 pack` we use the `Typed` value:
 
 ```go
-typed := pack.NewTyped(
-    "x", pack.NewU64(1),
-    "y", pack.NewString("1"),
-)
-fmt.Printf("type: %v", typed.Type())
+import (
+    "encoding/json"
+    "fmt"
 
-typedData, _ := json.MarshalIndent(typed, "", "  ")
-fmt.Printf("json: %v", string(typedData))
+    "github.com/renproject/pack"
+)
+
+func main() {
+    typed := pack.NewTyped(
+        "x", pack.NewU64(1),
+        "y", pack.NewString("1"),
+    )
+    fmt.Printf("type: %v", typed.Type())
+
+    typedData, _ := json.MarshalIndent(typed, "", "  ")
+    fmt.Printf("json: %v", string(typedData))
+}
 ```
 
 Now, we can see that the type information of our value has also been marshalled. In the case of JSON, the type information favours being verbose, so that it is easily debuggable by humans. However, the binary representation is much more compact. In practice, most services in distributed systems should use binary marshalling, unless they are in debug mode (binary marshalling is not only more compact, but it is also faster to marshal).
@@ -61,14 +87,22 @@ Now, we can see that the type information of our value has also been marshalled.
 Types are not always simple. In the case of integers, there is minimal information that we need to know: what kind of integer is it? The only answers are `U8`, `U16`, `U32`, `U64`, `U128`, and `U256`. However, structs and lists are more complex data types and the same question has an infinite possible answers. This is where _kinds_ are useful. The kind of a value can be thought of as the "type of the type". We can understand this better with a few examples:
 
 ```go
-x := pack.NewStruct("foo", pack.NewString("bar"))
-y := pack.NewStruct("bar", pack.NewBool(true))
+import (
+    "fmt"
 
-fmt.Printf("x type: %v", x.Type())
-fmt.Printf("y type: %v", y.Type())
+    "github.com/renproject/pack"
+)
 
-fmt.Printf("x kind: %v", x.Type().Kind())
-fmt.Printf("y kind: %v", y.Type().Kind())
+func main() {
+    x := pack.NewStruct("foo", pack.NewString("bar"))
+    y := pack.NewStruct("bar", pack.NewBool(true))
+
+    fmt.Printf("x type: %v", x.Type())
+    fmt.Printf("y type: %v", y.Type())
+
+    fmt.Printf("x kind: %v", x.Type().Kind())
+    fmt.Printf("y kind: %v", y.Type().Kind())
+}
 ```
 
 We can see from this example that, although `x` and `y` have different _types_, they both have the same _kind_; they are both structs. It turns out that the existence of kinds is necessary when marshaling/unmarshaling type information, but you should very rarely need to explicitly use kinds.
