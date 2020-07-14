@@ -93,4 +93,12 @@ var _ = Describe("Typed", func() {
 			Expect(quick.Check(f, nil)).To(Succeed())
 		})
 	})
+
+	Context("when unmarshaling a non-struct", func() {
+		It("should return an error", func() {
+			typed := pack.NewTyped("foo", pack.NewString("bar"))
+			data := []byte(`{"t":"string","v":"bar"}`)
+			Expect(typed.UnmarshalJSON(data)).ToNot(Succeed())
+		})
+	})
 })

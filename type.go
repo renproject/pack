@@ -24,32 +24,6 @@ type Type interface {
 	UnmarshalValueJSON(data []byte) (Value, error)
 }
 
-type typeNil struct{}
-
-func (typeNil) Kind() Kind {
-	return KindNil
-}
-
-func (typeNil) UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error) {
-	return nil, buf, rem, nil
-}
-
-func (typeNil) UnmarshalValueJSON(data []byte) (Value, error) {
-	return nil, nil
-}
-
-func (t typeNil) SizeHint() int {
-	return 0
-}
-
-func (t typeNil) Marshal(buf []byte, rem int) ([]byte, int, error) {
-	return buf, rem, nil
-}
-
-func (t typeNil) MarshalText() ([]byte, error) {
-	return t.Kind().MarshalText()
-}
-
 type typeBool struct{}
 
 func (typeBool) Kind() Kind {
@@ -602,27 +576,27 @@ func SizeHintType(t Type) int {
 func MarshalType(t Type, buf []byte, rem int) ([]byte, int, error) {
 	switch t.Kind() {
 	case KindBool:
-		return t.Kind().Marshal(buf, rem)
+		return t.Marshal(buf, rem)
 	case KindU8:
-		return t.Kind().Marshal(buf, rem)
+		return t.Marshal(buf, rem)
 	case KindU16:
-		return t.Kind().Marshal(buf, rem)
+		return t.Marshal(buf, rem)
 	case KindU32:
-		return t.Kind().Marshal(buf, rem)
+		return t.Marshal(buf, rem)
 	case KindU64:
-		return t.Kind().Marshal(buf, rem)
+		return t.Marshal(buf, rem)
 	case KindU128:
-		return t.Kind().Marshal(buf, rem)
+		return t.Marshal(buf, rem)
 	case KindU256:
-		return t.Kind().Marshal(buf, rem)
+		return t.Marshal(buf, rem)
 	case KindString:
-		return t.Kind().Marshal(buf, rem)
+		return t.Marshal(buf, rem)
 	case KindBytes:
-		return t.Kind().Marshal(buf, rem)
+		return t.Marshal(buf, rem)
 	case KindBytes32:
-		return t.Kind().Marshal(buf, rem)
+		return t.Marshal(buf, rem)
 	case KindBytes65:
-		return t.Kind().Marshal(buf, rem)
+		return t.Marshal(buf, rem)
 	case KindStruct, KindList:
 		var err error
 		if buf, rem, err = t.Kind().Marshal(buf, rem); err != nil {
@@ -747,7 +721,7 @@ func unmarshalTypeJSON(data []byte) (Type, error) {
 		case KindBytes65:
 			return typeBytes65{}, nil
 		default:
-			return typeNil{}, nil
+			return nil, fmt.Errorf("unexpected kind %v", kind)
 		}
 	}
 	// Unmarshal into a map. We expect that there will be exactly one key: the
@@ -768,7 +742,7 @@ func unmarshalTypeJSON(data []byte) (Type, error) {
 			}
 			return t, nil
 		default:
-			return typeNil{}, nil
+			return nil, fmt.Errorf("unexpected kind %v", kind)
 		}
 	}
 	panic("unreachable")
