@@ -13,7 +13,7 @@ import (
 
 var _ = Describe("Typed", func() {
 
-	numTrials := 10
+	numTrials := 100
 
 	Context("when fuzzing", func() {
 		It("should not panic", func() {
