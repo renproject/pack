@@ -11,8 +11,9 @@ In distributed systems, message passing often requires marshaling/unmarshaling m
 - [x] `Bool`,
 - [x] `U8`, `U16`, `U32`, `U16`, `U32`, `U64`, `U128`, `U256`,
 - [x] `String`, `Bytes`, `Bytes32`, `Bytes65`,
-- [x] `Struct`, and
-- [ ] `List`.
+- [x] `Struct`,
+- [ ] `List`, and
+- [ ] custom types.
 
 ## Values
 
