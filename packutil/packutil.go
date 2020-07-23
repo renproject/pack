@@ -112,16 +112,16 @@ func AddOverflow(t reflect.Type, assign bool) {
 	// Generate
 	var x, y reflect.Value
 	switch t {
-	case reflect.TypeOf(pack.U8{}):
+	case reflect.TypeOf(pack.U8(0)):
 		x = reflect.ValueOf(pack.NewU8(uint8(255)))
 		y = reflect.ValueOf(pack.NewU8(uint8(1)))
-	case reflect.TypeOf(pack.U16{}):
+	case reflect.TypeOf(pack.U16(0)):
 		x = reflect.ValueOf(pack.NewU16(uint16(65535)))
 		y = reflect.ValueOf(pack.NewU16(uint16(1)))
-	case reflect.TypeOf(pack.U32{}):
+	case reflect.TypeOf(pack.U32(0)):
 		x = reflect.ValueOf(pack.NewU32(uint32(4294967295)))
 		y = reflect.ValueOf(pack.NewU32(uint32(1)))
-	case reflect.TypeOf(pack.U64{}):
+	case reflect.TypeOf(pack.U64(0)):
 		x = reflect.ValueOf(pack.NewU64(uint64(18446744073709551615)))
 		y = reflect.ValueOf(pack.NewU64(uint64(1)))
 	case reflect.TypeOf(pack.U128{}):
@@ -151,16 +151,16 @@ func SubUnderflow(t reflect.Type, assign bool) {
 	// Generate
 	var x, y reflect.Value
 	switch t {
-	case reflect.TypeOf(pack.U8{}):
+	case reflect.TypeOf(pack.U8(0)):
 		x = reflect.ValueOf(pack.NewU8(uint8(0)))
 		y = reflect.ValueOf(pack.NewU8(uint8(1)))
-	case reflect.TypeOf(pack.U16{}):
+	case reflect.TypeOf(pack.U16(0)):
 		x = reflect.ValueOf(pack.NewU16(uint16(0)))
 		y = reflect.ValueOf(pack.NewU16(uint16(1)))
-	case reflect.TypeOf(pack.U32{}):
+	case reflect.TypeOf(pack.U32(0)):
 		x = reflect.ValueOf(pack.NewU32(uint32(0)))
 		y = reflect.ValueOf(pack.NewU32(uint32(1)))
-	case reflect.TypeOf(pack.U64{}):
+	case reflect.TypeOf(pack.U64(0)):
 		x = reflect.ValueOf(pack.NewU64(uint64(0)))
 		y = reflect.ValueOf(pack.NewU64(uint64(1)))
 	case reflect.TypeOf(pack.U128{}):
@@ -193,16 +193,16 @@ func AddSubCheck(t reflect.Type) error {
 	var x, y reflect.Value
 GENERATE:
 	switch t {
-	case reflect.TypeOf(pack.U8{}):
+	case reflect.TypeOf(pack.U8(0)):
 		x = reflect.ValueOf(pack.NewU8(uint8(r.Int()) / 2))
 		y = reflect.ValueOf(pack.NewU8(uint8(r.Int()) / 2))
-	case reflect.TypeOf(pack.U16{}):
+	case reflect.TypeOf(pack.U16(0)):
 		x = reflect.ValueOf(pack.NewU16(uint16(r.Int()) / 2))
 		y = reflect.ValueOf(pack.NewU16(uint16(r.Int()) / 2))
-	case reflect.TypeOf(pack.U32{}):
+	case reflect.TypeOf(pack.U32(0)):
 		x = reflect.ValueOf(pack.NewU32(uint32(r.Int()) / 2))
 		y = reflect.ValueOf(pack.NewU32(uint32(r.Int()) / 2))
-	case reflect.TypeOf(pack.U64{}):
+	case reflect.TypeOf(pack.U64(0)):
 		x = reflect.ValueOf(pack.NewU64(uint64(r.Int()) / 2))
 		y = reflect.ValueOf(pack.NewU64(uint64(r.Int()) / 2))
 	case reflect.TypeOf(pack.U128{}):

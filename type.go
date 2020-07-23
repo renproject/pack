@@ -61,13 +61,13 @@ func (typeU8) Kind() Kind {
 }
 
 func (typeU8) UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error) {
-	value := U8{}
+	value := U8(0)
 	buf, rem, err := value.Unmarshal(buf, rem)
 	return value, buf, rem, err
 }
 
 func (typeU8) UnmarshalValueJSON(data []byte) (Value, error) {
-	value := U8{}
+	value := U8(0)
 	err := value.UnmarshalJSON(data)
 	return value, err
 }
@@ -91,13 +91,13 @@ func (typeU16) Kind() Kind {
 }
 
 func (typeU16) UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error) {
-	value := U16{}
+	value := U16(0)
 	buf, rem, err := value.Unmarshal(buf, rem)
 	return value, buf, rem, err
 }
 
 func (typeU16) UnmarshalValueJSON(data []byte) (Value, error) {
-	value := U16{}
+	value := U16(0)
 	err := value.UnmarshalJSON(data)
 	return value, err
 }
@@ -121,13 +121,13 @@ func (typeU32) Kind() Kind {
 }
 
 func (typeU32) UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error) {
-	value := U32{}
+	value := U32(0)
 	buf, rem, err := value.Unmarshal(buf, rem)
 	return value, buf, rem, err
 }
 
 func (typeU32) UnmarshalValueJSON(data []byte) (Value, error) {
-	value := U32{}
+	value := U32(0)
 	err := value.UnmarshalJSON(data)
 	return value, err
 }
@@ -151,13 +151,13 @@ func (typeU64) Kind() Kind {
 }
 
 func (typeU64) UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error) {
-	value := U64{}
+	value := U64(0)
 	buf, rem, err := value.Unmarshal(buf, rem)
 	return value, buf, rem, err
 }
 
 func (typeU64) UnmarshalValueJSON(data []byte) (Value, error) {
-	value := U64{}
+	value := U64(0)
 	err := value.UnmarshalJSON(data)
 	return value, err
 }

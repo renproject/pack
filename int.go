@@ -13,13 +13,11 @@ import (
 )
 
 // U8 represents an 8-bit unsigned integer.
-type U8 struct {
-	inner uint8
-}
+type U8 uint8
 
 // NewU8 returns a uint8 wrapped as a U8.
 func NewU8(x uint8) U8 {
-	return U8{inner: x}
+	return U8(x)
 }
 
 // Type returns the type of this value.
@@ -29,13 +27,13 @@ func (U8) Type() Type {
 
 // Uint8 returns the inner uint8.
 func (u8 U8) Uint8() uint8 {
-	return u8.inner
+	return uint8(u8)
 }
 
 // Add one U8 to another and return the result.
 func (u8 U8) Add(other U8) U8 {
-	ret := U8{inner: u8.inner + other.inner}
-	if ret.inner < u8.inner {
+	ret := U8(u8 + other)
+	if ret < u8 {
 		panic("overflow")
 	}
 	return ret
@@ -43,8 +41,8 @@ func (u8 U8) Add(other U8) U8 {
 
 // Sub one U8 from another and return the result.
 func (u8 U8) Sub(other U8) U8 {
-	ret := U8{inner: u8.inner - other.inner}
-	if ret.inner > u8.inner {
+	ret := U8(u8 - other)
+	if ret > u8 {
 		panic("underflow")
 	}
 	return ret
@@ -53,8 +51,8 @@ func (u8 U8) Sub(other U8) U8 {
 // AddAssign will add one U8 to another and assign the result to the left-hand
 // side.
 func (u8 *U8) AddAssign(other U8) {
-	u8.inner = u8.inner + other.inner
-	if u8.inner < other.inner {
+	*u8 = *u8 + other
+	if *u8 < other {
 		panic("overflow")
 	}
 }
@@ -62,17 +60,17 @@ func (u8 *U8) AddAssign(other U8) {
 // SubAssign will sub one U8 from another and assign the result to the left-hand
 // side.
 func (u8 *U8) SubAssign(other U8) {
-	res := u8.inner - other.inner
-	if res > u8.inner {
+	res := *u8 - other
+	if res > *u8 {
 		panic("underflow")
 	}
-	u8.inner = res
+	*u8 = res
 }
 
 // Equal compares one U8 to another. If they are equal, then it returns true.
 // Otherwise, it returns false.
 func (u8 U8) Equal(other U8) bool {
-	return u8.inner == other.inner
+	return u8 == other
 }
 
 // SizeHint returns the number of bytes required to represent a U8 in binary.
@@ -82,12 +80,12 @@ func (u8 U8) SizeHint() int {
 
 // Marshal the U8 to binary.
 func (u8 U8) Marshal(buf []byte, rem int) ([]byte, int, error) {
-	return surge.MarshalU8(u8.inner, buf, rem)
+	return surge.MarshalU8(uint8(u8), buf, rem)
 }
 
 // Unmarshal the U8 from binary.
 func (u8 *U8) Unmarshal(buf []byte, rem int) ([]byte, int, error) {
-	return surge.UnmarshalU8(&u8.inner, buf, rem)
+	return surge.UnmarshalU8((*uint8)(u8), buf, rem)
 }
 
 // MarshalJSON implements the JSON marshaler interface. U8s are marshaled as
@@ -107,27 +105,25 @@ func (u8 *U8) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	u8.inner = uint8(x)
+	*u8 = U8(x)
 	return nil
 }
 
 func (u8 U8) String() string {
-	return fmt.Sprintf("%v", u8.inner)
+	return fmt.Sprintf("%v", uint8(u8))
 }
 
 // U16 represents a 16-bit unsigned integer.
-type U16 struct {
-	inner uint16
-}
+type U16 uint16
 
 // NewU16 returns a uint16 wrapped as a U16.
 func NewU16(x uint16) U16 {
-	return U16{inner: x}
+	return U16(x)
 }
 
 // NewU16FromU8 returns a uint16 wrapped as a U16.
 func NewU16FromU8(x U8) U16 {
-	return U16{inner: uint16(x.Uint8())}
+	return U16(uint16(x.Uint8()))
 }
 
 // Type returns the type of this value.
@@ -137,13 +133,13 @@ func (U16) Type() Type {
 
 // Uint16 returns the inner uint16.
 func (u16 U16) Uint16() uint16 {
-	return u16.inner
+	return uint16(u16)
 }
 
 // Add one U16 to another and return the result.
 func (u16 U16) Add(other U16) U16 {
-	ret := U16{inner: u16.inner + other.inner}
-	if ret.inner < u16.inner {
+	ret := U16(u16 + other)
+	if ret < u16 {
 		panic("overflow")
 	}
 	return ret
@@ -151,8 +147,8 @@ func (u16 U16) Add(other U16) U16 {
 
 // Sub one U16 from another and return the result.
 func (u16 U16) Sub(other U16) U16 {
-	ret := U16{inner: u16.inner - other.inner}
-	if ret.inner > u16.inner {
+	ret := U16(u16 - other)
+	if ret > u16 {
 		panic("underflow")
 	}
 	return ret
@@ -161,8 +157,8 @@ func (u16 U16) Sub(other U16) U16 {
 // AddAssign will add one U16 to another and assign the result to the left-hand
 // side.
 func (u16 *U16) AddAssign(other U16) {
-	u16.inner = u16.inner + other.inner
-	if u16.inner < other.inner {
+	*u16 = *u16 + other
+	if *u16 < other {
 		panic("overflow")
 	}
 }
@@ -170,17 +166,17 @@ func (u16 *U16) AddAssign(other U16) {
 // SubAssign will sub one U16 from another and assign the result to the left-hand
 // side.
 func (u16 *U16) SubAssign(other U16) {
-	res := u16.inner - other.inner
-	if res > u16.inner {
+	res := *u16 - other
+	if res > *u16 {
 		panic("underflow")
 	}
-	u16.inner = res
+	*u16 = res
 }
 
 // Equal compares one U16 to another. If they are equal, then it returns true.
 // Otherwise, it returns false.
 func (u16 U16) Equal(other U16) bool {
-	return u16.inner == other.inner
+	return u16 == other
 }
 
 // SizeHint returns the number of bytes required to represent a U16 in binary.
@@ -190,12 +186,12 @@ func (u16 U16) SizeHint() int {
 
 // Marshal the U16 to binary.
 func (u16 U16) Marshal(buf []byte, rem int) ([]byte, int, error) {
-	return surge.MarshalU16(u16.inner, buf, rem)
+	return surge.MarshalU16(uint16(u16), buf, rem)
 }
 
 // Unmarshal the U16 from binary.
 func (u16 *U16) Unmarshal(buf []byte, rem int) ([]byte, int, error) {
-	return surge.UnmarshalU16(&u16.inner, buf, rem)
+	return surge.UnmarshalU16((*uint16)(u16), buf, rem)
 }
 
 // MarshalJSON implements the JSON marshaler interface. U16s are marshaled as
@@ -215,32 +211,30 @@ func (u16 *U16) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	u16.inner = uint16(x)
+	*u16 = U16(x)
 	return nil
 }
 
 func (u16 U16) String() string {
-	return fmt.Sprintf("%v", u16.inner)
+	return fmt.Sprintf("%v", uint16(u16))
 }
 
 // U32 represents a 32-bit unsigned integer.
-type U32 struct {
-	inner uint32
-}
+type U32 uint32
 
 // NewU32 returns a uint32 wrapped as a U32.
 func NewU32(x uint32) U32 {
-	return U32{inner: x}
+	return U32(x)
 }
 
 // NewU32FromU8 returns a uint32 wrapped as a U32.
 func NewU32FromU8(x U8) U32 {
-	return U32{inner: uint32(x.Uint8())}
+	return U32(uint32(x.Uint8()))
 }
 
 // NewU32FromU16 returns a uint32 wrapped as a U32.
 func NewU32FromU16(x U16) U32 {
-	return U32{inner: uint32(x.Uint16())}
+	return U32(uint32(x.Uint16()))
 }
 
 // Type returns the type of this value.
@@ -250,13 +244,13 @@ func (U32) Type() Type {
 
 // Uint32 returns the inner uint32.
 func (u32 U32) Uint32() uint32 {
-	return u32.inner
+	return uint32(u32)
 }
 
 // Add one U32 to another and return the result.
 func (u32 U32) Add(other U32) U32 {
-	ret := U32{inner: u32.inner + other.inner}
-	if ret.inner < u32.inner {
+	ret := U32(u32 + other)
+	if ret < u32 {
 		panic("overflow")
 	}
 	return ret
@@ -264,8 +258,8 @@ func (u32 U32) Add(other U32) U32 {
 
 // Sub one U32 from another and return the result.
 func (u32 U32) Sub(other U32) U32 {
-	ret := U32{inner: u32.inner - other.inner}
-	if ret.inner > u32.inner {
+	ret := U32(u32 - other)
+	if ret > u32 {
 		panic("underflow")
 	}
 	return ret
@@ -274,8 +268,8 @@ func (u32 U32) Sub(other U32) U32 {
 // AddAssign will add one U32 to another and assign the result to the left-hand
 // side.
 func (u32 *U32) AddAssign(other U32) {
-	u32.inner = u32.inner + other.inner
-	if u32.inner < other.inner {
+	*u32 = *u32 + other
+	if *u32 < other {
 		panic("overflow")
 	}
 }
@@ -283,17 +277,17 @@ func (u32 *U32) AddAssign(other U32) {
 // SubAssign will sub one U32 from another and assign the result to the left-hand
 // side.
 func (u32 *U32) SubAssign(other U32) {
-	res := u32.inner - other.inner
-	if res > u32.inner {
+	res := *u32 - other
+	if res > *u32 {
 		panic("underflow")
 	}
-	u32.inner = res
+	*u32 = res
 }
 
 // Equal compares one U32 to another. If they are equal, then it returns true.
 // Otherwise, it returns false.
 func (u32 U32) Equal(other U32) bool {
-	return u32.inner == other.inner
+	return u32 == other
 }
 
 // SizeHint returns the number of bytes required to represent a U32 in binary.
@@ -303,12 +297,12 @@ func (u32 U32) SizeHint() int {
 
 // Marshal the U32 to binary.
 func (u32 U32) Marshal(buf []byte, rem int) ([]byte, int, error) {
-	return surge.MarshalU32(u32.inner, buf, rem)
+	return surge.MarshalU32(uint32(u32), buf, rem)
 }
 
 // Unmarshal the U32 from binary.
 func (u32 *U32) Unmarshal(buf []byte, rem int) ([]byte, int, error) {
-	return surge.UnmarshalU32(&u32.inner, buf, rem)
+	return surge.UnmarshalU32((*uint32)(u32), buf, rem)
 }
 
 // MarshalJSON implements the JSON marshaler interface. U32s are marshaled as
@@ -328,37 +322,35 @@ func (u32 *U32) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	u32.inner = uint32(x)
+	*u32 = U32(x)
 	return nil
 }
 
 func (u32 U32) String() string {
-	return fmt.Sprintf("%v", u32.inner)
+	return fmt.Sprintf("%v", uint32(u32))
 }
 
 // U64 represents a 64-bit unsigned integer.
-type U64 struct {
-	inner uint64
-}
+type U64 uint64
 
 // NewU64 returns a uint64 wrapped as a U64.
 func NewU64(x uint64) U64 {
-	return U64{inner: x}
+	return U64(x)
 }
 
 // NewU64FromU8 returns a uint64 wrapped as a U64.
 func NewU64FromU8(x U8) U64 {
-	return U64{inner: uint64(x.Uint8())}
+	return U64(uint64(x.Uint8()))
 }
 
 // NewU64FromU16 returns a uint64 wrapped as a U64.
 func NewU64FromU16(x U16) U64 {
-	return U64{inner: uint64(x.Uint16())}
+	return U64(uint64(x.Uint16()))
 }
 
 // NewU64FromU32 returns a uint32 wrapped as a U64.
 func NewU64FromU32(x U32) U64 {
-	return U64{inner: uint64(x.Uint32())}
+	return U64(uint64(x.Uint32()))
 }
 
 // Type returns the type of this value.
@@ -368,13 +360,13 @@ func (U64) Type() Type {
 
 // Uint64 returns the inner uint64.
 func (u64 U64) Uint64() uint64 {
-	return u64.inner
+	return uint64(u64)
 }
 
 // Add one U64 to another and return the result.
 func (u64 U64) Add(other U64) U64 {
-	ret := U64{inner: u64.inner + other.inner}
-	if ret.inner < u64.inner {
+	ret := U64(u64 + other)
+	if ret < u64 {
 		panic("overflow")
 	}
 	return ret
@@ -382,8 +374,8 @@ func (u64 U64) Add(other U64) U64 {
 
 // Sub one U64 from another and return the result.
 func (u64 U64) Sub(other U64) U64 {
-	ret := U64{inner: u64.inner - other.inner}
-	if ret.inner > u64.inner {
+	ret := U64(u64 - other)
+	if ret > u64 {
 		panic("underflow")
 	}
 	return ret
@@ -392,8 +384,8 @@ func (u64 U64) Sub(other U64) U64 {
 // AddAssign will add one U64 to another and assign the result to the left-hand
 // side.
 func (u64 *U64) AddAssign(other U64) {
-	u64.inner = u64.inner + other.inner
-	if u64.inner < other.inner {
+	*u64 = *u64 + other
+	if *u64 < other {
 		panic("overflow")
 	}
 }
@@ -401,17 +393,17 @@ func (u64 *U64) AddAssign(other U64) {
 // SubAssign will sub one U64 from another and assign the result to the left-hand
 // side.
 func (u64 *U64) SubAssign(other U64) {
-	res := u64.inner - other.inner
-	if res > u64.inner {
+	res := *u64 - other
+	if res > *u64 {
 		panic("underflow")
 	}
-	u64.inner = res
+	*u64 = res
 }
 
 // Equal compares one U64 to another. If they are equal, then it returns true.
 // Otherwise, it returns false.
 func (u64 U64) Equal(other U64) bool {
-	return u64.inner == other.inner
+	return u64 == other
 }
 
 // SizeHint returns the number of bytes required to represent a U64 in binary.
@@ -421,12 +413,12 @@ func (u64 U64) SizeHint() int {
 
 // Marshal the U64 to binary.
 func (u64 U64) Marshal(buf []byte, rem int) ([]byte, int, error) {
-	return surge.MarshalU64(u64.inner, buf, rem)
+	return surge.MarshalU64(uint64(u64), buf, rem)
 }
 
 // Unmarshal the U64 from binary.
 func (u64 *U64) Unmarshal(buf []byte, rem int) ([]byte, int, error) {
-	return surge.UnmarshalU64(&u64.inner, buf, rem)
+	return surge.UnmarshalU64((*uint64)(u64), buf, rem)
 }
 
 // MarshalJSON implements the JSON marshaler interface. U64s are marshaled as
@@ -446,12 +438,12 @@ func (u64 *U64) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	u64.inner = uint64(x)
+	*u64 = U64(x)
 	return nil
 }
 
 func (u64 U64) String() string {
-	return fmt.Sprintf("%v", u64.inner)
+	return fmt.Sprintf("%v", uint64(u64))
 }
 
 type U128 struct {
@@ -893,16 +885,16 @@ const (
 // Maximum values for unsigned integers.
 var (
 	MaxU8 = func() U8 {
-		return U8{inner: 255}
+		return U8(255)
 	}()
 	MaxU16 = func() U16 {
-		return U16{inner: 65535}
+		return U16(65535)
 	}()
 	MaxU32 = func() U32 {
-		return U32{inner: 4294967295}
+		return U32(4294967295)
 	}()
 	MaxU64 = func() U64 {
-		return U64{inner: 18446744073709551615}
+		return U64(18446744073709551615)
 	}()
 	MaxU128 = func() U128 {
 		x, _ := new(big.Int).SetString("340282366920938463463374607431768211455", 10)

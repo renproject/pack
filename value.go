@@ -28,13 +28,13 @@ func Generate(r *rand.Rand, size int, allowStruct bool) reflect.Value {
 	case KindBool:
 		t = reflect.TypeOf(Bool(false))
 	case KindU8:
-		t = reflect.TypeOf(U8{})
+		t = reflect.TypeOf(U8(0))
 	case KindU16:
-		t = reflect.TypeOf(U16{})
+		t = reflect.TypeOf(U16(0))
 	case KindU32:
-		t = reflect.TypeOf(U32{})
+		t = reflect.TypeOf(U32(0))
 	case KindU64:
-		t = reflect.TypeOf(U64{})
+		t = reflect.TypeOf(U64(0))
 	case KindU128:
 		t = reflect.TypeOf(U128{})
 	case KindU256:
