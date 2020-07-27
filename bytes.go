@@ -71,7 +71,12 @@ func (x String) String() string {
 // Generate a random string. This method is implemented for use in quick tests.
 // See https://golang.org/pkg/testing/quick/#Generator for more information.
 func (String) Generate(r *rand.Rand, size int) reflect.Value {
-	v, _ := quick.Value(reflect.TypeOf(""), r)
+	v := reflect.New(reflect.TypeOf("")).Elem()
+	codePoints := make([]rune, size)
+	for i := 0; i < size; i++ {
+		codePoints[i] = rune(rand.Intn(0x10ffff))
+	}
+	v.SetString(string(codePoints))
 	return reflect.ValueOf(NewString(v.String()))
 }
 
@@ -143,8 +148,11 @@ func (x Bytes) String() string {
 // tests. See https://golang.org/pkg/testing/quick/#Generator for more
 // information.
 func (Bytes) Generate(r *rand.Rand, size int) reflect.Value {
-	v, _ := quick.Value(reflect.TypeOf([]byte{}), r)
-	return reflect.ValueOf(NewBytes(v.Interface().([]byte)))
+	data := make([]byte, size)
+	if _, err := rand.Read(data); err != nil {
+		panic(err)
+	}
+	return reflect.ValueOf(Bytes(data))
 }
 
 // Bytes32 represents a static-sized 32-byte array.
