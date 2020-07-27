@@ -71,13 +71,11 @@ func (x String) String() string {
 // Generate a random string. This method is implemented for use in quick tests.
 // See https://golang.org/pkg/testing/quick/#Generator for more information.
 func (String) Generate(r *rand.Rand, size int) reflect.Value {
-	v := reflect.New(reflect.TypeOf("")).Elem()
-	codePoints := make([]rune, size)
+	runes := make([]rune, size)
 	for i := 0; i < size; i++ {
-		codePoints[i] = rune(rand.Intn(0x10ffff))
+		runes[i] = rune(rand.Intn(0x10ffff))
 	}
-	v.SetString(string(codePoints))
-	return reflect.ValueOf(NewString(v.String()))
+	return reflect.ValueOf(String(string(runes)))
 }
 
 // Bytes represents a slice of bytes with a dynamic length.
