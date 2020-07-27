@@ -13,7 +13,7 @@ In distributed systems, message passing often requires marshaling/unmarshaling m
 - [x] `String`, `Bytes`, `Bytes32`, `Bytes65`,
 - [x] `Struct`,
 - [ ] `List`, and
-- [ ] custom types.
+- [x] custom types.
 
 ## Values
 
@@ -107,6 +107,49 @@ func main() {
 ```
 
 We can see from this example that, although `x` and `y` have different _types_, they both have the same _kind_; they are both structs. It turns out that the existence of kinds is necessary when marshaling/unmarshaling type information, but you should very rarely need to explicitly use kinds.
+
+## Custom Types
+
+It is often convenient to use strongly-typed values at the language level (e.g. define/use custom Go structs). Using `📦 pack`, we can `Encode` and `Decode` to/from custom structs:
+
+```go
+import (
+    "fmt"
+
+    "github.com/renproject/pack"
+)
+
+type Foo struct {
+    X pack.U64 `json:"x"`
+    Y pack.U64 `json:"y"`
+}
+
+func main() {
+    foo := Foo {
+        X: pack.NewU64(1),
+        Y: pack.NewU64(2),
+    }
+    bar := pack.NewStruct(
+        "x", pack.NewU64(3),
+        "y", pack.NewU64(4),
+    )
+    
+    packed, err := pack.Encode(foo)
+    if err != nil {
+        panic(err)
+    }
+
+    fmt.Printf("foo type: %v", packed.Type())
+    fmt.Printf("bar type: %v", bar.Type())
+    
+    if err := pack.Decode(&foo, bar); err != nil {
+        panic(err)
+    }
+    
+    fmt.Printf("foo.X: %v", foo.X)
+    fmt.Printf("foo.Y: %v", foo.Y)
+}
+```
 
 ## Contribution
 
