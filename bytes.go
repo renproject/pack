@@ -73,7 +73,7 @@ func (x String) String() string {
 func (String) Generate(r *rand.Rand, size int) reflect.Value {
 	runes := make([]rune, size)
 	for i := 0; i < size; i++ {
-		runes[i] = rune(rand.Intn(0x10ffff))
+		runes[i] = rune(r.Intn(0x10ffff))
 	}
 	return reflect.ValueOf(String(string(runes)))
 }
@@ -147,7 +147,7 @@ func (x Bytes) String() string {
 // information.
 func (Bytes) Generate(r *rand.Rand, size int) reflect.Value {
 	data := make([]byte, size)
-	if _, err := rand.Read(data); err != nil {
+	if _, err := r.Read(data); err != nil {
 		panic(err)
 	}
 	return reflect.ValueOf(Bytes(data))
