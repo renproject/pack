@@ -228,6 +228,48 @@ var _ = Describe("Bytes", func() {
 		})
 	})
 
+	Context("when marshaling and unmarshaling byte slices to and from text", func() {
+		It("should return itself", func() {
+			f := func(x pack.Bytes) bool {
+				data, err := x.MarshalText()
+				Expect(err).ToNot(HaveOccurred())
+				y := pack.Bytes{}
+				err = y.UnmarshalText(data)
+				Expect(err).ToNot(HaveOccurred())
+				return x.Equal(y)
+			}
+			Expect(quick.Check(f, nil)).To(Succeed())
+		})
+	})
+
+	Context("when marshaling and unmarshaling byte32 arrays to and from text", func() {
+		It("should return itself", func() {
+			f := func(x pack.Bytes32) bool {
+				data, err := x.MarshalText()
+				Expect(err).ToNot(HaveOccurred())
+				y := pack.Bytes32{}
+				err = y.UnmarshalText(data)
+				Expect(err).ToNot(HaveOccurred())
+				return x.Equal(&y)
+			}
+			Expect(quick.Check(f, nil)).To(Succeed())
+		})
+	})
+
+	Context("when marshaling and unmarshaling byte65 arrays to and from text", func() {
+		It("should return itself", func() {
+			f := func(x pack.Bytes65) bool {
+				data, err := x.MarshalText()
+				Expect(err).ToNot(HaveOccurred())
+				y := pack.Bytes65{}
+				err = y.UnmarshalText(data)
+				Expect(err).ToNot(HaveOccurred())
+				return x.Equal(&y)
+			}
+			Expect(quick.Check(f, nil)).To(Succeed())
+		})
+	})
+
 	Context("when stringifying strings", func() {
 		It("should return itself", func() {
 			f := func(x string) bool {
