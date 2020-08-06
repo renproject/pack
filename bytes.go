@@ -137,6 +137,11 @@ func (x *Bytes) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// MarshalText marshals the bytes to text.
+func (x Bytes) MarshalText() ([]byte, error) {
+	return []byte(x.String()), nil
+}
+
 // String returns a base64 raw URL encoding of the bytes.
 func (x Bytes) String() string {
 	return base64.RawURLEncoding.EncodeToString([]byte(x))
@@ -207,8 +212,8 @@ func (x Bytes32) MarshalJSON() ([]byte, error) {
 	return json.Marshal(base64.RawURLEncoding.EncodeToString(x[:]))
 }
 
-// UnmarshalJSON unmarshals the bytes from JSON. This is done by decoding the
-// bytes from a base64 raw URL encoded string.
+// UnmarshalJSON unmarshals the 32-byte array from JSON. This is done by
+// decoding the bytes from a base64 raw URL encoded string.
 func (x *Bytes32) UnmarshalJSON(data []byte) error {
 	var str string
 	if err := json.Unmarshal(data, &str); err != nil {
@@ -223,6 +228,11 @@ func (x *Bytes32) UnmarshalJSON(data []byte) error {
 	}
 	copy(x[:], data)
 	return nil
+}
+
+// MarshalText marshals the 32-byte array to text.
+func (x Bytes32) MarshalText() ([]byte, error) {
+	return []byte(x.String()), nil
 }
 
 // String returns a base64 raw URL encoding of the bytes.
@@ -292,8 +302,8 @@ func (x Bytes65) MarshalJSON() ([]byte, error) {
 	return json.Marshal(base64.RawURLEncoding.EncodeToString(x[:]))
 }
 
-// UnmarshalJSON unmarshals the bytes from JSON. This is done by decoding the
-// bytes from a base64 raw URL encoded string.
+// UnmarshalJSON unmarshals the 65-byte array from JSON. This is done by
+// decoding the bytes from a base64 raw URL encoded string.
 func (x *Bytes65) UnmarshalJSON(data []byte) error {
 	var str string
 	if err := json.Unmarshal(data, &str); err != nil {
@@ -308,6 +318,11 @@ func (x *Bytes65) UnmarshalJSON(data []byte) error {
 	}
 	copy(x[:], data)
 	return nil
+}
+
+// MarshalText marshals the 65-byte array to text.
+func (x Bytes65) MarshalText() ([]byte, error) {
+	return []byte(x.String()), nil
 }
 
 // String returns a base64 raw URL encoding of the bytes.
