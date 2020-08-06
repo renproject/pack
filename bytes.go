@@ -137,9 +137,21 @@ func (x *Bytes) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// MarshalText marshals the bytes to text.
+// MarshalText marshals the bytes to text. This is done by encoding the bytes
+// into a base64 raw URL encoded string.
 func (x Bytes) MarshalText() ([]byte, error) {
-	return []byte(x.String()), nil
+	return []byte(base64.RawURLEncoding.EncodeToString([]byte(x))), nil
+}
+
+// UnmarshalText unmarshals the bytes from text. This is done by decoding the
+// bytes from a base64 raw URL encoded string.
+func (x *Bytes) UnmarshalText(text []byte) error {
+	data, err := base64.RawURLEncoding.DecodeString(string(text))
+	if err != nil {
+		return err
+	}
+	*x = data
+	return nil
 }
 
 // String returns a base64 raw URL encoding of the bytes.
@@ -230,9 +242,24 @@ func (x *Bytes32) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// MarshalText marshals the 32-byte array to text.
+// MarshalText marshals the 32-byte array to text. This is done by encoding the
+// bytes into a base64 raw URL encoded string.
 func (x Bytes32) MarshalText() ([]byte, error) {
-	return []byte(x.String()), nil
+	return []byte(base64.RawURLEncoding.EncodeToString(x[:])), nil
+}
+
+// UnmarshalText unmarshals the 32-byte array from text. This is done by decoding the
+// bytes from a base64 raw URL encoded string.
+func (x *Bytes32) UnmarshalText(text []byte) error {
+	data, err := base64.RawURLEncoding.DecodeString(string(text))
+	if err != nil {
+		return err
+	}
+	if len(data) != 32 {
+		return fmt.Errorf("expected len=32, got len=%v", len(data))
+	}
+	copy(x[:], data)
+	return nil
 }
 
 // String returns a base64 raw URL encoding of the bytes.
@@ -320,9 +347,24 @@ func (x *Bytes65) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// MarshalText marshals the 65-byte array to text.
+// MarshalText marshals the 65-byte array to text. This is done by encoding the
+// bytes into a base64 raw URL encoded string.
 func (x Bytes65) MarshalText() ([]byte, error) {
-	return []byte(x.String()), nil
+	return []byte(base64.RawURLEncoding.EncodeToString(x[:])), nil
+}
+
+// UnmarshalText unmarshals the 65-byte array from text. This is done by decoding the
+// bytes from a base64 raw URL encoded string.
+func (x *Bytes65) UnmarshalText(text []byte) error {
+	data, err := base64.RawURLEncoding.DecodeString(string(text))
+	if err != nil {
+		return err
+	}
+	if len(data) != 65 {
+		return fmt.Errorf("expected len=65, got len=%v", len(data))
+	}
+	copy(x[:], data)
+	return nil
 }
 
 // String returns a base64 raw URL encoding of the bytes.
