@@ -470,6 +470,22 @@ func NewU128FromU64(x U64) U128 {
 	return U128{inner: new(big.Int).SetUint64(x.Uint64())}
 }
 
+func NewU128FromUint8(x uint8) U128 {
+	return U128{inner: new(big.Int).SetUint64(uint64(x))}
+}
+
+func NewU128FromUint16(x uint16) U128 {
+	return U128{inner: new(big.Int).SetUint64(uint64(x))}
+}
+
+func NewU128FromUint32(x uint32) U128 {
+	return U128{inner: new(big.Int).SetUint64(uint64(x))}
+}
+
+func NewU128FromUint64(x uint64) U128 {
+	return U128{inner: new(big.Int).SetUint64(x)}
+}
+
 func NewU128FromInt(x *big.Int) U128 {
 	if x.Sign() == -1 {
 		panic("underflow")
@@ -520,6 +536,29 @@ func (u128 U128) Sub(other U128) U128 {
 	}
 	if ret.inner.Sign() == -1 {
 		panic("underflow")
+	}
+	return ret
+}
+
+func (u128 U128) Mul(other U128) U128 {
+	ret := U128{inner: new(big.Int)}
+	if other.inner == nil {
+		ret.inner.Set(u128.inner)
+	} else {
+		ret.inner.Mul(u128.inner, other.inner)
+	}
+	if ret.inner.Cmp(MaxU128.inner) >= 0 {
+		panic("overflow")
+	}
+	return ret
+}
+
+func (u128 U128) Div(other U128) U128 {
+	ret := U128{inner: new(big.Int)}
+	if other.inner == nil {
+		ret.inner.Set(u128.inner)
+	} else {
+		ret.inner.Div(u128.inner, other.inner)
 	}
 	return ret
 }
@@ -643,6 +682,22 @@ func NewU256FromU128(x U128) U256 {
 	return NewU256FromInt(x.Int())
 }
 
+func NewU256FromUint8(x uint8) U256 {
+	return U256{inner: new(big.Int).SetUint64(uint64(x))}
+}
+
+func NewU256FromUint16(x uint16) U256 {
+	return U256{inner: new(big.Int).SetUint64(uint64(x))}
+}
+
+func NewU256FromUint32(x uint32) U256 {
+	return U256{inner: new(big.Int).SetUint64(uint64(x))}
+}
+
+func NewU256FromUint64(x uint64) U256 {
+	return U256{inner: new(big.Int).SetUint64(x)}
+}
+
 func NewU256FromInt(x *big.Int) U256 {
 	if x.Sign() == -1 {
 		panic("underflow")
@@ -693,6 +748,29 @@ func (u256 U256) Sub(other U256) U256 {
 	}
 	if ret.inner.Sign() == -1 {
 		panic("underflow")
+	}
+	return ret
+}
+
+func (u256 U256) Mul(other U256) U256 {
+	ret := U256{inner: new(big.Int)}
+	if other.inner == nil {
+		ret.inner.Set(u256.inner)
+	} else {
+		ret.inner.Mul(u256.inner, other.inner)
+	}
+	if ret.inner.Cmp(MaxU256.inner) >= 0 {
+		panic("overflow")
+	}
+	return ret
+}
+
+func (u256 U256) Div(other U256) U256 {
+	ret := U256{inner: new(big.Int)}
+	if other.inner == nil {
+		ret.inner.Set(u256.inner)
+	} else {
+		ret.inner.Div(u256.inner, other.inner)
 	}
 	return ret
 }
