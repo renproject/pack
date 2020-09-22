@@ -599,6 +599,46 @@ func (u128 U128) Equal(other U128) bool {
 	return u128.inner.Cmp(other.inner) == 0
 }
 
+func (u128 U128) LessThan(other U128) bool {
+	if u128.inner == nil {
+		return other.inner != nil && other.inner.Sign() > 0
+	}
+	if other.inner == nil {
+		return u128.inner != nil && u128.inner.Sign() < 0
+	}
+	return u128.inner.Cmp(other.inner) < 0
+}
+
+func (u128 U128) LessThanEqual(other U128) bool {
+	if u128.inner == nil {
+		return other.inner != nil && other.inner.Sign() >= 0
+	}
+	if other.inner == nil {
+		return u128.inner != nil && u128.inner.Sign() <= 0
+	}
+	return u128.inner.Cmp(other.inner) <= 0
+}
+
+func (u128 U128) GreaterThan(other U128) bool {
+	if u128.inner == nil {
+		return other.inner != nil && other.inner.Sign() < 0
+	}
+	if other.inner == nil {
+		return u128.inner != nil && u128.inner.Sign() > 0
+	}
+	return u128.inner.Cmp(other.inner) > 0
+}
+
+func (u128 U128) GreaterThanEqual(other U128) bool {
+	if u128.inner == nil {
+		return other.inner != nil && other.inner.Sign() <= 0
+	}
+	if other.inner == nil {
+		return u128.inner != nil && u128.inner.Sign() >= 0
+	}
+	return u128.inner.Cmp(other.inner) >= 0
+}
+
 func (u128 U128) SizeHint() int {
 	return 16
 }
@@ -809,6 +849,46 @@ func (u256 U256) Equal(other U256) bool {
 		return u256.inner == nil || u256.inner.Sign() == 0
 	}
 	return u256.inner.Cmp(other.inner) == 0
+}
+
+func (u256 U256) LessThan(other U256) bool {
+	if u256.inner == nil {
+		return other.inner != nil && other.inner.Sign() > 0
+	}
+	if other.inner == nil {
+		return u256.inner != nil && u256.inner.Sign() < 0
+	}
+	return u256.inner.Cmp(other.inner) < 0
+}
+
+func (u256 U256) LessThanEqual(other U256) bool {
+	if u256.inner == nil {
+		return other.inner != nil && other.inner.Sign() >= 0
+	}
+	if other.inner == nil {
+		return u256.inner != nil && u256.inner.Sign() <= 0
+	}
+	return u256.inner.Cmp(other.inner) <= 0
+}
+
+func (u256 U256) GreaterThan(other U256) bool {
+	if u256.inner == nil {
+		return other.inner != nil && other.inner.Sign() < 0
+	}
+	if other.inner == nil {
+		return u256.inner != nil && u256.inner.Sign() > 0
+	}
+	return u256.inner.Cmp(other.inner) > 0
+}
+
+func (u256 U256) GreaterThanEqual(other U256) bool {
+	if u256.inner == nil {
+		return other.inner != nil && other.inner.Sign() <= 0
+	}
+	if other.inner == nil {
+		return u256.inner != nil && u256.inner.Sign() >= 0
+	}
+	return u256.inner.Cmp(other.inner) >= 0
 }
 
 func (u256 U256) SizeHint() int {
