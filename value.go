@@ -22,9 +22,14 @@ type Value interface {
 // other types. See https://golang.org/pkg/testing/quick/#Generator for more
 // information.
 func Generate(r *rand.Rand, size int, allowStruct, allowList bool) reflect.Value {
-	t := reflect.Type(nil)
 	kind, _ := quick.Value(reflect.TypeOf(Kind(0)), r)
-	switch kind.Interface().(Kind) {
+	return GenerateFromKind(r, size, kind.Interface().(Kind), allowStruct, allowList)
+}
+
+// GenerateFromKind generates a random value given a Kind.
+func GenerateFromKind(r *rand.Rand, size int, kind Kind, allowStruct, allowList bool) reflect.Value {
+	t := reflect.Type(nil)
+	switch kind {
 	case KindBool:
 		t = reflect.TypeOf(Bool(false))
 	case KindU8:

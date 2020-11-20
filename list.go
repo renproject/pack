@@ -79,14 +79,12 @@ func (v List) String() string {
 // See https://golang.org/pkg/testing/quick/#Generator for more information.
 // Generated lists will never contain embedded lists.
 func (List) Generate(r *rand.Rand, size int) reflect.Value {
-	v := Generate(r, size, false, false).Interface().(Value)
 	l := List{
-		T:     v.Type(),
+		T:     Generate(r, size, false, false).Interface().(Value).Type(),
 		Elems: make([]Value, 0, size),
 	}
 	for i := 0; i < size; i++ {
-		// TODO: Generate values for a single type.
-		v = Generate(r, size, false, false).Interface().(Value)
+		v := GenerateFromKind(r, size, l.T.Kind(), false, false).Interface().(Value)
 		l.Elems = append(l.Elems, v)
 	}
 	return reflect.ValueOf(l)
