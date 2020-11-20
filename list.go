@@ -12,15 +12,31 @@ type List struct {
 	Elems []Value
 }
 
-func NewList(vs ...interface{}) List {
+func NewList(vs ...interface{}) (List, error) {
+	if len(vs) == 0 {
+		return List{}, nil
+	}
+
+	var t Type
 	elems := make([]Value, len(vs))
+	var ok bool
 	for i := range elems {
-		elems[i] = vs[i].(Value)
+		elems[i], ok = vs[i].(Value)
+		if !ok {
+			return List{}, fmt.Errorf("cannot convert list element to type Value")
+		}
+
+		// Verify the list elements have a consistent type.
+		if t == nil {
+			t = elems[i].Type()
+		} else if elems[i].Type() != t {
+			return List{}, fmt.Errorf("inconsistent list type: expected %v, got %v", t, elems[i].Type())
+		}
 	}
 	return List{
-		T:     elems[0].Type(),
+		T:     t,
 		Elems: elems,
-	}
+	}, nil
 }
 
 // Type returns the list type.

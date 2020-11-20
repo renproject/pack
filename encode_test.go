@@ -28,6 +28,7 @@ var _ = Describe("Encoding", func() {
 		reflect.TypeOf(pack.Bytes32{}),
 		reflect.TypeOf(pack.Bytes65{}),
 		reflect.TypeOf(pack.Struct{}),
+		reflect.TypeOf(pack.List{}),
 
 		// Standard types.
 		reflect.TypeOf(false),
@@ -59,6 +60,8 @@ var _ = Describe("Encoding", func() {
 				InnerDash    uint64 `json:"-"`
 				InnerUnnamed uint64
 			} `json:"inner"`
+
+			List pack.List `json:"list"`
 		}{}),
 
 		// Mixed types.
@@ -81,6 +84,8 @@ var _ = Describe("Encoding", func() {
 				InnerDash    pack.U64 `json:"-"`
 				InnerUnnamed pack.U64
 			} `json:"inner"`
+
+			List pack.List `json:"list"`
 		}{}),
 	}
 	numTrials := 10

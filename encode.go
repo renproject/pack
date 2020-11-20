@@ -36,6 +36,8 @@ func Encode(v interface{}) (Value, error) {
 		return v, nil
 	case Struct:
 		return v, nil
+	case List:
+		return v, nil
 	case Typed:
 		return v, nil
 	}
@@ -60,7 +62,7 @@ func Encode(v interface{}) (Value, error) {
 		if valueOf.Type().Elem().Kind() == reflect.Uint8 {
 			return NewBytes(valueOf.Bytes()), nil
 		}
-		return nil, fmt.Errorf("non-exhaustive pattern: type %T", v)
+		return NewList(valueOf.Interface())
 	case reflect.Array:
 		typeOf := valueOf.Type()
 		if typeOf.Elem().Kind() == reflect.Uint8 {
@@ -71,7 +73,7 @@ func Encode(v interface{}) (Value, error) {
 				return valueOf.Convert(reflect.TypeOf(Bytes65{})).Interface().(Bytes65), nil
 			}
 		}
-		return nil, fmt.Errorf("non-exhaustive pattern: type %T", v)
+		return NewList(valueOf.Interface())
 	case reflect.Struct:
 		typeOf := valueOf.Type()
 		n := typeOf.NumField()
@@ -183,6 +185,12 @@ func Decode(interf interface{}, v Value) error {
 			return nil
 		}
 		return fmt.Errorf("unexpected value of type %T", v)
+	case *List:
+		if v, ok := v.(List); ok {
+			*interf = v
+			return nil
+		}
+		return fmt.Errorf("unexpected value of type %T", v)
 	case *Typed:
 		if v, ok := v.(Typed); ok {
 			*interf = v
@@ -248,6 +256,10 @@ func Decode(interf interface{}, v Value) error {
 			}
 			return fmt.Errorf("unexpected value of type %T", v)
 		}
+		if v, ok := v.(List); ok {
+			elem.Set(reflect.ValueOf(v).Convert(typeOf))
+			return nil
+		}
 		return fmt.Errorf("non-exhaustive pattern: type %T", v)
 	case reflect.Array:
 		typeOf := elem.Type()
@@ -266,6 +278,10 @@ func Decode(interf interface{}, v Value) error {
 				}
 				return fmt.Errorf("unexpected value of type %T", v)
 			}
+		}
+		if v, ok := v.(List); ok {
+			elem.Set(reflect.ValueOf(v).Convert(typeOf))
+			return nil
 		}
 		return fmt.Errorf("non-exhaustive pattern: type %T", v)
 	case reflect.Struct:
