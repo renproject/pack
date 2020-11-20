@@ -21,7 +21,7 @@ type Value interface {
 // Generate a random value. This is helpful when implementing generators for
 // other types. See https://golang.org/pkg/testing/quick/#Generator for more
 // information.
-func Generate(r *rand.Rand, size int, allowStruct bool) reflect.Value {
+func Generate(r *rand.Rand, size int, allowStruct, allowList bool) reflect.Value {
 	t := reflect.Type(nil)
 	kind, _ := quick.Value(reflect.TypeOf(Kind(0)), r)
 	switch kind.Interface().(Kind) {
@@ -49,9 +49,14 @@ func Generate(r *rand.Rand, size int, allowStruct bool) reflect.Value {
 		t = reflect.TypeOf(Bytes65{})
 	case KindStruct:
 		if !allowStruct {
-			return Generate(r, size, allowStruct)
+			return Generate(r, size, allowStruct, allowList)
 		}
 		t = reflect.TypeOf(Struct{})
+	case KindList:
+		if !allowList {
+			return Generate(r, size, allowStruct, allowList)
+		}
+		t = reflect.TypeOf(List{})
 	default:
 		panic("non-exhaustive pattern")
 	}

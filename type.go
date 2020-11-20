@@ -539,6 +539,78 @@ func (typeStruct) Generate(r *rand.Rand, size int) reflect.Value {
 	return reflect.ValueOf(typeStruct(typeStructFields))
 }
 
+type typeList struct {
+	Type Type
+	Size uint64
+}
+
+func (typeList) Kind() Kind {
+	return KindList
+}
+
+func (t typeList) UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error) {
+	v := List{
+		T:     t.Type,
+		Elems: make([]Value, t.Size),
+	}
+	for i := range v.Elems {
+		var err error
+		var value Value
+		if value, buf, rem, err = v.T.UnmarshalValue(buf, rem); err != nil {
+			return nil, buf, rem, fmt.Errorf("unmarshaling list value: %v", err)
+		}
+		v.Elems[i] = value
+	}
+	return v, buf, rem, nil
+}
+
+func (t typeList) UnmarshalValueJSON(data []byte) (Value, error) {
+	raw := []json.RawMessage{}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return nil, err
+	}
+	v := List{
+		T:     t.Type,
+		Elems: make([]Value, t.Size),
+	}
+	for i := range v.Elems {
+		value, err := v.T.UnmarshalValueJSON(raw[i])
+		if err != nil {
+			return nil, fmt.Errorf("unmarshaling list value: %v", err)
+		}
+		v.Elems[i] = value
+	}
+	return v, nil
+}
+
+func (t typeList) SizeHint() int {
+	return t.Type.SizeHint() + 64
+}
+
+func (t typeList) Marshal(buf []byte, rem int) ([]byte, int, error) {
+	var err error
+	if buf, rem, err = MarshalType(t.Type, buf, rem); err != nil {
+		return buf, rem, err
+	}
+	if buf, rem, err = surge.MarshalU64(t.Size, buf, rem); err != nil {
+		return buf, rem, err
+	}
+	return buf, rem, nil
+}
+
+func (t *typeList) Unmarshal(buf []byte, rem int) ([]byte, int, error) {
+	var err error
+	buf, rem, err = UnmarshalType(&t.Type, buf, rem)
+	if err != nil {
+		return buf, rem, err
+	}
+	buf, rem, err = surge.UnmarshalU64(&t.Size, buf, rem)
+	if err != nil {
+		return buf, rem, err
+	}
+	return buf, rem, nil
+}
+
 // SizeHintType returns the number of bytes requires to represent this type in
 // binary.
 func SizeHintType(t Type) int {
@@ -659,13 +731,13 @@ func UnmarshalType(t *Type, buf []byte, rem int) ([]byte, int, error) {
 		}
 		*t = ts
 		return buf, rem, nil
-	// TODO: Support lists.
-	//
-	//	case KindStruct:
-	//	    t := typeStruct{}
-	//	    buf, rem, err := t.Unmarshal(buf, rem)
-	//	    return t, buf, rem, err
-	//
+	case KindList:
+		tl := typeList{}
+		if buf, rem, err = tl.Unmarshal(buf, rem); err != nil {
+			return buf, rem, err
+		}
+		*t = tl
+		return buf, rem, nil
 	default:
 		return buf, rem, fmt.Errorf("unsupported kind %v", kind)
 	}
@@ -739,6 +811,12 @@ func unmarshalTypeJSON(data []byte) (Type, error) {
 			t := typeStruct{}
 			if err := json.Unmarshal(data, &t); err != nil {
 				return nil, fmt.Errorf("unmarshaling struct: %v", err)
+			}
+			return t, nil
+		case KindList:
+			t := typeList{}
+			if err := json.Unmarshal(data, &t); err != nil {
+				return nil, fmt.Errorf("unmarshaling list: %v", err)
 			}
 			return t, nil
 		default:
