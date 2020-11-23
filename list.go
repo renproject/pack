@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"math/rand"
 	"reflect"
+
+	"github.com/renproject/surge"
 )
 
 type List struct {
@@ -12,26 +14,21 @@ type List struct {
 	Elems []Value
 }
 
-func NewList(vs ...interface{}) (List, error) {
+func NewList(vs ...Value) (List, error) {
 	if len(vs) == 0 {
 		return List{}, nil
 	}
 
-	var t Type
 	elems := make([]Value, len(vs))
-	var ok bool
+	var t Type
 	for i := range elems {
-		elems[i], ok = vs[i].(Value)
-		if !ok {
-			return List{}, fmt.Errorf("cannot convert list element to type Value")
-		}
-
 		// Verify the list elements have a consistent type.
 		if t == nil {
-			t = elems[i].Type()
-		} else if elems[i].Type() != t {
+			t = vs[i].Type()
+		} else if vs[i].Type() != t {
 			return List{}, fmt.Errorf("inconsistent list type: expected %v, got %v", t, elems[i].Type())
 		}
+		elems[i] = vs[i]
 	}
 	return List{
 		T:     t,
@@ -43,30 +40,18 @@ func NewList(vs ...interface{}) (List, error) {
 func (v List) Type() Type {
 	return typeList{
 		Type: v.T,
-		Size: uint64(len(v.Elems)),
 	}
 }
 
 // SizeHint returns the number of bytes required to represent the list in
 // binary.
 func (v List) SizeHint() int {
-	return v.T.SizeHint() * len(v.Elems)
+	return surge.SizeHint(v.Elems)
 }
 
 // Marshal the list into binary.
 func (v List) Marshal(buf []byte, rem int) ([]byte, int, error) {
-	var err error
-	buf, rem, err = v.T.Marshal(buf, rem)
-	if err != nil {
-		return buf, rem, err
-	}
-	for _, elem := range v.Elems {
-		buf, rem, err = elem.Marshal(buf, rem)
-		if err != nil {
-			return buf, rem, err
-		}
-	}
-	return buf, rem, nil
+	return surge.Marshal(v.Elems, buf, rem)
 }
 
 // MarshalJSON marshals the list to JSON.
@@ -86,7 +71,7 @@ func (v List) MarshalJSON() ([]byte, error) {
 func (v List) String() string {
 	data, err := v.MarshalJSON()
 	if err != nil {
-		return fmt.Sprintf(`{"error": %v}`, err)
+		return err.Error()
 	}
 	return string(data)
 }

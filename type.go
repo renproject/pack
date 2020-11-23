@@ -541,7 +541,6 @@ func (typeStruct) Generate(r *rand.Rand, size int) reflect.Value {
 
 type typeList struct {
 	Type Type
-	Size uint64
 }
 
 func (typeList) Kind() Kind {
@@ -549,12 +548,16 @@ func (typeList) Kind() Kind {
 }
 
 func (t typeList) UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error) {
+	var err error
+	var numElems uint32
+	if buf, rem, err = surge.UnmarshalU32(&numElems, buf, rem); err != nil {
+		return nil, buf, rem, fmt.Errorf("unmarshaling list length: %v", err)
+	}
 	v := List{
 		T:     t.Type,
-		Elems: make([]Value, t.Size),
+		Elems: make([]Value, numElems),
 	}
 	for i := range v.Elems {
-		var err error
 		var value Value
 		if value, buf, rem, err = v.T.UnmarshalValue(buf, rem); err != nil {
 			return nil, buf, rem, fmt.Errorf("unmarshaling list value: %v", err)
@@ -571,7 +574,7 @@ func (t typeList) UnmarshalValueJSON(data []byte) (Value, error) {
 	}
 	v := List{
 		T:     t.Type,
-		Elems: make([]Value, t.Size),
+		Elems: make([]Value, len(raw)),
 	}
 	for i := range v.Elems {
 		value, err := v.T.UnmarshalValueJSON(raw[i])
@@ -588,27 +591,11 @@ func (t typeList) SizeHint() int {
 }
 
 func (t typeList) Marshal(buf []byte, rem int) ([]byte, int, error) {
-	var err error
-	if buf, rem, err = MarshalType(t.Type, buf, rem); err != nil {
-		return buf, rem, err
-	}
-	if buf, rem, err = surge.MarshalU64(t.Size, buf, rem); err != nil {
-		return buf, rem, err
-	}
-	return buf, rem, nil
+	return MarshalType(t.Type, buf, rem)
 }
 
 func (t *typeList) Unmarshal(buf []byte, rem int) ([]byte, int, error) {
-	var err error
-	buf, rem, err = UnmarshalType(&t.Type, buf, rem)
-	if err != nil {
-		return buf, rem, err
-	}
-	buf, rem, err = surge.UnmarshalU64(&t.Size, buf, rem)
-	if err != nil {
-		return buf, rem, err
-	}
-	return buf, rem, nil
+	return UnmarshalType(&t.Type, buf, rem)
 }
 
 // SizeHintType returns the number of bytes requires to represent this type in

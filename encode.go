@@ -62,7 +62,15 @@ func Encode(v interface{}) (Value, error) {
 		if valueOf.Type().Elem().Kind() == reflect.Uint8 {
 			return NewBytes(valueOf.Bytes()), nil
 		}
-		return NewList(valueOf.Interface())
+		var err error
+		elems := make([]Value, valueOf.Len())
+		for i := 0; i < valueOf.Len(); i++ {
+			elems[i], err = Encode(valueOf.Index(i).Interface())
+			if err != nil {
+				return nil, fmt.Errorf("encoding list item: %v", err)
+			}
+		}
+		return NewList(elems...)
 	case reflect.Array:
 		typeOf := valueOf.Type()
 		if typeOf.Elem().Kind() == reflect.Uint8 {
@@ -73,7 +81,7 @@ func Encode(v interface{}) (Value, error) {
 				return valueOf.Convert(reflect.TypeOf(Bytes65{})).Interface().(Bytes65), nil
 			}
 		}
-		return NewList(valueOf.Interface())
+		return nil, fmt.Errorf("non-exhaustive pattern: type %T", v)
 	case reflect.Struct:
 		typeOf := valueOf.Type()
 		n := typeOf.NumField()
@@ -256,11 +264,13 @@ func Decode(interf interface{}, v Value) error {
 			}
 			return fmt.Errorf("unexpected value of type %T", v)
 		}
-		if v, ok := v.(List); ok {
-			elem.Set(reflect.ValueOf(v).Convert(typeOf))
-			return nil
+		elem.Set(reflect.MakeSlice(typeOf, len(v.(List).Elems), len(v.(List).Elems)))
+		for i := 0; i < len(v.(List).Elems); i++ {
+			if err := Decode(elem.Index(i).Addr().Interface(), v.(List).Elems[i]); err != nil {
+				return fmt.Errorf("decoding list item: %v", err)
+			}
 		}
-		return fmt.Errorf("non-exhaustive pattern: type %T", v)
+		return nil
 	case reflect.Array:
 		typeOf := elem.Type()
 		if typeOf.Elem().Kind() == reflect.Uint8 {
@@ -278,10 +288,6 @@ func Decode(interf interface{}, v Value) error {
 				}
 				return fmt.Errorf("unexpected value of type %T", v)
 			}
-		}
-		if v, ok := v.(List); ok {
-			elem.Set(reflect.ValueOf(v).Convert(typeOf))
-			return nil
 		}
 		return fmt.Errorf("non-exhaustive pattern: type %T", v)
 	case reflect.Struct:
@@ -312,7 +318,7 @@ func Decode(interf interface{}, v Value) error {
 			}
 			if name != "" {
 				if err := Decode(elem.Field(i).Addr().Interface(), structOrTyped.Get(name)); err != nil {
-					return fmt.Errorf("encoding \"%v\": %v", f.Name, err)
+					return fmt.Errorf("decoding \"%v\": %v", f.Name, err)
 				}
 			}
 		}

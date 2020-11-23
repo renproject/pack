@@ -41,6 +41,8 @@ var _ = Describe("Encoding", func() {
 		reflect.TypeOf([32]byte{}),
 		reflect.TypeOf([65]byte{}),
 		reflect.TypeOf(struct{}{}),
+		reflect.TypeOf([]string{}),
+		reflect.TypeOf([]uint64{}),
 		reflect.TypeOf(struct {
 			X       uint8  `json:"x"`
 			Y       uint16 `json:"y"`
@@ -61,7 +63,8 @@ var _ = Describe("Encoding", func() {
 				InnerUnnamed uint64
 			} `json:"inner"`
 
-			List pack.List `json:"list"`
+			ListOfStrings []string `json:"listOfStrings"`
+			ListOfUints   []uint64 `json:"listOfUints"`
 		}{}),
 
 		// Mixed types.
