@@ -58,7 +58,7 @@ func (v List) Marshal(buf []byte, rem int) ([]byte, int, error) {
 func (v List) MarshalJSON() ([]byte, error) {
 	raw := []interface{}{}
 	for _, elem := range v.Elems {
-		rawField, err := json.Marshal(elem)
+		rawField, err := elem.MarshalJSON()
 		if err != nil {
 			return nil, fmt.Errorf("marshaling list element: %v", err)
 		}
