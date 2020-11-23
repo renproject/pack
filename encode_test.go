@@ -103,6 +103,29 @@ var _ = Describe("Encoding", func() {
 					x, ok := quick.Value(t, r)
 					Expect(ok).To(BeTrue())
 
+					// Ensure there are no empty slices generated as they will
+					// return an error when encoding.
+					switch t.Kind() {
+					case reflect.Slice:
+						if x.Len() == 0 {
+							continue
+						}
+					case reflect.Struct:
+						emptySlice := false
+						for i := 0; i < x.NumField(); i++ {
+							switch x.Field(i).Kind() {
+							case reflect.Slice:
+								if x.Field(i).Len() == 0 {
+									emptySlice = true
+									break
+								}
+							}
+						}
+						if emptySlice {
+							continue
+						}
+					}
+
 					v, err := pack.Encode(x.Interface())
 					Expect(err).ToNot(HaveOccurred())
 

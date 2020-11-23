@@ -16,7 +16,7 @@ type List struct {
 
 func NewList(vs ...Value) (List, error) {
 	if len(vs) == 0 {
-		return List{}, nil
+		return List{}, fmt.Errorf("cannot construct list with no elements")
 	}
 
 	elems := make([]Value, len(vs))
@@ -54,6 +54,18 @@ func (v List) Marshal(buf []byte, rem int) ([]byte, int, error) {
 	return surge.Marshal(v.Elems, buf, rem)
 }
 
+// Unmarshal the list from binary.
+func (v *List) Unmarshal(buf []byte, rem int) ([]byte, int, error) {
+	buf, rem, err := surge.Unmarshal(&v.Elems, buf, rem)
+	if err != nil {
+		return buf, rem, err
+	}
+	if len(v.Elems) == 0 {
+		return buf, rem, fmt.Errorf("cannot construct list with no elements")
+	}
+	return buf, rem, nil
+}
+
 // MarshalJSON marshals the list to JSON.
 func (v List) MarshalJSON() ([]byte, error) {
 	raw := []interface{}{}
@@ -80,6 +92,10 @@ func (v List) String() string {
 // See https://golang.org/pkg/testing/quick/#Generator for more information.
 // Generated lists will never contain embedded lists.
 func (List) Generate(r *rand.Rand, size int) reflect.Value {
+	// The list must contain at least one element.
+	if size == 0 {
+		size = 1
+	}
 	l := List{
 		T:     Generate(r, size, false, false).Interface().(Value).Type(),
 		Elems: make([]Value, 0, size),
