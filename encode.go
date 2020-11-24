@@ -36,6 +36,8 @@ func Encode(v interface{}) (Value, error) {
 		return v, nil
 	case Struct:
 		return v, nil
+	case List:
+		return v, nil
 	case Typed:
 		return v, nil
 	}
@@ -60,7 +62,15 @@ func Encode(v interface{}) (Value, error) {
 		if valueOf.Type().Elem().Kind() == reflect.Uint8 {
 			return NewBytes(valueOf.Bytes()), nil
 		}
-		return nil, fmt.Errorf("non-exhaustive pattern: type %T", v)
+		var err error
+		elems := make([]Value, valueOf.Len())
+		for i := 0; i < valueOf.Len(); i++ {
+			elems[i], err = Encode(valueOf.Index(i).Interface())
+			if err != nil {
+				return nil, fmt.Errorf("encoding list item: %v", err)
+			}
+		}
+		return NewList(elems...)
 	case reflect.Array:
 		typeOf := valueOf.Type()
 		if typeOf.Elem().Kind() == reflect.Uint8 {
@@ -183,6 +193,12 @@ func Decode(interf interface{}, v Value) error {
 			return nil
 		}
 		return fmt.Errorf("unexpected value of type %T", v)
+	case *List:
+		if v, ok := v.(List); ok {
+			*interf = v
+			return nil
+		}
+		return fmt.Errorf("unexpected value of type %T", v)
 	case *Typed:
 		if v, ok := v.(Typed); ok {
 			*interf = v
@@ -248,7 +264,13 @@ func Decode(interf interface{}, v Value) error {
 			}
 			return fmt.Errorf("unexpected value of type %T", v)
 		}
-		return fmt.Errorf("non-exhaustive pattern: type %T", v)
+		elem.Set(reflect.MakeSlice(typeOf, len(v.(List).Elems), len(v.(List).Elems)))
+		for i := 0; i < len(v.(List).Elems); i++ {
+			if err := Decode(elem.Index(i).Addr().Interface(), v.(List).Elems[i]); err != nil {
+				return fmt.Errorf("decoding list item: %v", err)
+			}
+		}
+		return nil
 	case reflect.Array:
 		typeOf := elem.Type()
 		if typeOf.Elem().Kind() == reflect.Uint8 {
@@ -296,7 +318,7 @@ func Decode(interf interface{}, v Value) error {
 			}
 			if name != "" {
 				if err := Decode(elem.Field(i).Addr().Interface(), structOrTyped.Get(name)); err != nil {
-					return fmt.Errorf("encoding \"%v\": %v", f.Name, err)
+					return fmt.Errorf("decoding \"%v\": %v", f.Name, err)
 				}
 			}
 		}

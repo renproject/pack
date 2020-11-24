@@ -189,11 +189,8 @@ func (kind Kind) Generate(r *rand.Rand, size int) reflect.Value {
 		return reflect.ValueOf(KindBytes65)
 	case 11:
 		return reflect.ValueOf(KindStruct)
-	// TODO: Support lists.
-	//
-	//	case 12:
-	//	    return reflect.ValueOf(KindList)
-	//
+	case 12:
+		return reflect.ValueOf(KindList)
 	default:
 		// It is intentional that this case never happens.
 		return reflect.ValueOf(KindNil)

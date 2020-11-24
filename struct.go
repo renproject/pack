@@ -43,7 +43,7 @@ func (x StructField) Generate(r *rand.Rand, size int) reflect.Value {
 	for {
 		return reflect.ValueOf(StructField{
 			Name:  name.String(),
-			Value: Generate(r, size, false).Interface().(Value),
+			Value: Generate(r, size, false, false).Interface().(Value),
 		})
 	}
 }

@@ -28,6 +28,7 @@ var _ = Describe("Encoding", func() {
 		reflect.TypeOf(pack.Bytes32{}),
 		reflect.TypeOf(pack.Bytes65{}),
 		reflect.TypeOf(pack.Struct{}),
+		reflect.TypeOf(pack.List{}),
 
 		// Standard types.
 		reflect.TypeOf(false),
@@ -40,6 +41,8 @@ var _ = Describe("Encoding", func() {
 		reflect.TypeOf([32]byte{}),
 		reflect.TypeOf([65]byte{}),
 		reflect.TypeOf(struct{}{}),
+		reflect.TypeOf([]string{}),
+		reflect.TypeOf([]uint64{}),
 		reflect.TypeOf(struct {
 			X       uint8  `json:"x"`
 			Y       uint16 `json:"y"`
@@ -59,6 +62,9 @@ var _ = Describe("Encoding", func() {
 				InnerDash    uint64 `json:"-"`
 				InnerUnnamed uint64
 			} `json:"inner"`
+
+			ListOfStrings []string `json:"listOfStrings"`
+			ListOfUints   []uint64 `json:"listOfUints"`
 		}{}),
 
 		// Mixed types.
@@ -81,6 +87,8 @@ var _ = Describe("Encoding", func() {
 				InnerDash    pack.U64 `json:"-"`
 				InnerUnnamed pack.U64
 			} `json:"inner"`
+
+			List pack.List `json:"list"`
 		}{}),
 	}
 	numTrials := 10
@@ -94,6 +102,29 @@ var _ = Describe("Encoding", func() {
 				for trial := 0; trial < numTrials; trial++ {
 					x, ok := quick.Value(t, r)
 					Expect(ok).To(BeTrue())
+
+					// Ensure there are no empty slices generated as they will
+					// return an error when encoding.
+					switch t.Kind() {
+					case reflect.Slice:
+						if x.Len() == 0 {
+							continue
+						}
+					case reflect.Struct:
+						emptySlice := false
+						for i := 0; i < x.NumField(); i++ {
+							switch x.Field(i).Kind() {
+							case reflect.Slice:
+								if x.Field(i).Len() == 0 {
+									emptySlice = true
+									break
+								}
+							}
+						}
+						if emptySlice {
+							continue
+						}
+					}
 
 					v, err := pack.Encode(x.Interface())
 					Expect(err).ToNot(HaveOccurred())
