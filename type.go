@@ -1,6 +1,7 @@
 package pack
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"math/rand"
@@ -17,6 +18,10 @@ type Type interface {
 	// Kind returns the abstract "type of the type" for this type.
 	Kind() Kind
 
+	// Equals returns a boolean indicating whether or not the given type is
+	// identical to the current one.
+	Equals(other Type) bool
+
 	// Unmarshal a value of this type from binary.
 	UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error)
 
@@ -28,6 +33,18 @@ type typeBool struct{}
 
 func (typeBool) Kind() Kind {
 	return KindBool
+}
+
+func (t typeBool) Equals(other Type) bool {
+	a, err := surge.ToBinary(t)
+	if err != nil {
+		return false
+	}
+	b, err := surge.ToBinary(other)
+	if err != nil {
+		return false
+	}
+	return bytes.Equal(a, b)
 }
 
 func (typeBool) UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error) {
@@ -60,6 +77,18 @@ func (typeU8) Kind() Kind {
 	return KindU8
 }
 
+func (t typeU8) Equals(other Type) bool {
+	a, err := surge.ToBinary(t)
+	if err != nil {
+		return false
+	}
+	b, err := surge.ToBinary(other)
+	if err != nil {
+		return false
+	}
+	return bytes.Equal(a, b)
+}
+
 func (typeU8) UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error) {
 	value := U8(0)
 	buf, rem, err := value.Unmarshal(buf, rem)
@@ -88,6 +117,18 @@ type typeU16 struct{}
 
 func (typeU16) Kind() Kind {
 	return KindU16
+}
+
+func (t typeU16) Equals(other Type) bool {
+	a, err := surge.ToBinary(t)
+	if err != nil {
+		return false
+	}
+	b, err := surge.ToBinary(other)
+	if err != nil {
+		return false
+	}
+	return bytes.Equal(a, b)
 }
 
 func (typeU16) UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error) {
@@ -120,6 +161,18 @@ func (typeU32) Kind() Kind {
 	return KindU32
 }
 
+func (t typeU32) Equals(other Type) bool {
+	a, err := surge.ToBinary(t)
+	if err != nil {
+		return false
+	}
+	b, err := surge.ToBinary(other)
+	if err != nil {
+		return false
+	}
+	return bytes.Equal(a, b)
+}
+
 func (typeU32) UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error) {
 	value := U32(0)
 	buf, rem, err := value.Unmarshal(buf, rem)
@@ -148,6 +201,18 @@ type typeU64 struct{}
 
 func (typeU64) Kind() Kind {
 	return KindU64
+}
+
+func (t typeU64) Equals(other Type) bool {
+	a, err := surge.ToBinary(t)
+	if err != nil {
+		return false
+	}
+	b, err := surge.ToBinary(other)
+	if err != nil {
+		return false
+	}
+	return bytes.Equal(a, b)
 }
 
 func (typeU64) UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error) {
@@ -180,6 +245,18 @@ func (typeU128) Kind() Kind {
 	return KindU128
 }
 
+func (t typeU128) Equals(other Type) bool {
+	a, err := surge.ToBinary(t)
+	if err != nil {
+		return false
+	}
+	b, err := surge.ToBinary(other)
+	if err != nil {
+		return false
+	}
+	return bytes.Equal(a, b)
+}
+
 func (typeU128) UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error) {
 	value := U128{}
 	buf, rem, err := value.Unmarshal(buf, rem)
@@ -208,6 +285,18 @@ type typeU256 struct{}
 
 func (typeU256) Kind() Kind {
 	return KindU256
+}
+
+func (t typeU256) Equals(other Type) bool {
+	a, err := surge.ToBinary(t)
+	if err != nil {
+		return false
+	}
+	b, err := surge.ToBinary(other)
+	if err != nil {
+		return false
+	}
+	return bytes.Equal(a, b)
 }
 
 func (typeU256) UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error) {
@@ -240,6 +329,18 @@ func (typeString) Kind() Kind {
 	return KindString
 }
 
+func (t typeString) Equals(other Type) bool {
+	a, err := surge.ToBinary(t)
+	if err != nil {
+		return false
+	}
+	b, err := surge.ToBinary(other)
+	if err != nil {
+		return false
+	}
+	return bytes.Equal(a, b)
+}
+
 func (typeString) UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error) {
 	value := String("")
 	buf, rem, err := value.Unmarshal(buf, rem)
@@ -268,6 +369,18 @@ type typeBytes struct{}
 
 func (typeBytes) Kind() Kind {
 	return KindBytes
+}
+
+func (t typeBytes) Equals(other Type) bool {
+	a, err := surge.ToBinary(t)
+	if err != nil {
+		return false
+	}
+	b, err := surge.ToBinary(other)
+	if err != nil {
+		return false
+	}
+	return bytes.Equal(a, b)
 }
 
 func (typeBytes) UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error) {
@@ -300,6 +413,18 @@ func (typeBytes32) Kind() Kind {
 	return KindBytes32
 }
 
+func (t typeBytes32) Equals(other Type) bool {
+	a, err := surge.ToBinary(t)
+	if err != nil {
+		return false
+	}
+	b, err := surge.ToBinary(other)
+	if err != nil {
+		return false
+	}
+	return bytes.Equal(a, b)
+}
+
 func (typeBytes32) UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error) {
 	value := Bytes32{}
 	buf, rem, err := value.Unmarshal(buf, rem)
@@ -328,6 +453,18 @@ type typeBytes65 struct{}
 
 func (typeBytes65) Kind() Kind {
 	return KindBytes65
+}
+
+func (t typeBytes65) Equals(other Type) bool {
+	a, err := surge.ToBinary(t)
+	if err != nil {
+		return false
+	}
+	b, err := surge.ToBinary(other)
+	if err != nil {
+		return false
+	}
+	return bytes.Equal(a, b)
 }
 
 func (typeBytes65) UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error) {
@@ -427,6 +564,18 @@ type typeStruct []typeStructField
 
 func (typeStruct) Kind() Kind {
 	return KindStruct
+}
+
+func (t typeStruct) Equals(other Type) bool {
+	a, err := surge.ToBinary(t)
+	if err != nil {
+		return false
+	}
+	b, err := surge.ToBinary(other)
+	if err != nil {
+		return false
+	}
+	return bytes.Equal(a, b)
 }
 
 func (t typeStruct) UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error) {
@@ -545,6 +694,18 @@ type typeList struct {
 
 func (typeList) Kind() Kind {
 	return KindList
+}
+
+func (t typeList) Equals(other Type) bool {
+	a, err := surge.ToBinary(t)
+	if err != nil {
+		return false
+	}
+	b, err := surge.ToBinary(other)
+	if err != nil {
+		return false
+	}
+	return bytes.Equal(a, b)
 }
 
 func (t typeList) UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error) {
