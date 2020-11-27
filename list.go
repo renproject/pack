@@ -21,12 +21,12 @@ func NewList(vs ...Value) (List, error) {
 
 	elems := make([]Value, len(vs))
 	var t Type
-	for i := range elems {
+	for i := range vs {
 		// Verify the list elements have a consistent type.
 		if t == nil {
 			t = vs[i].Type()
-		} else if vs[i].Type() != t {
-			return List{}, fmt.Errorf("inconsistent list type: expected %v, got %v", t, elems[i].Type())
+		} else if !vs[i].Type().Equals(t) {
+			return List{}, fmt.Errorf("inconsistent list type: expected %v, got %v", t, vs[i].Type())
 		}
 		elems[i] = vs[i]
 	}
