@@ -1,11 +1,16 @@
 package pack_test
 
 import (
+	"bytes"
 	"fmt"
+	"math/rand"
 	"reflect"
+	"testing/quick"
+	"time"
 
 	"github.com/renproject/pack"
 	"github.com/renproject/pack/packutil"
+	"github.com/renproject/surge"
 	"github.com/renproject/surge/surgeutil"
 
 	. "github.com/onsi/ginkgo"
@@ -35,6 +40,8 @@ var _ = Describe("Types", func() {
 	numTrials := 10
 
 	for _, t := range ts {
+		t := t
+
 		Context(fmt.Sprintf("when fuzzing %v", t), func() {
 			It("should not panic", func() {
 				for trial := 0; trial < numTrials; trial++ {
@@ -84,6 +91,45 @@ var _ = Describe("Types", func() {
 				It("should return itself", func() {
 					for trial := 0; trial < numTrials; trial++ {
 						Expect(surgeutil.UnmarshalRemTooSmall(t)).To(Succeed())
+					}
+				})
+			})
+		})
+
+		Context(fmt.Sprintf("when checking equality of %v", t), func() {
+			Context("if the types are the same", func() {
+				It("should return true", func() {
+					r := rand.New(rand.NewSource(time.Now().UnixNano()))
+					for trial := 0; trial < numTrials; trial++ {
+						x, ok := quick.Value(t, r)
+						Expect(ok).To(BeTrue())
+						xType := x.Interface().(pack.Type)
+
+						Expect(xType.Equals(xType)).To(BeTrue())
+					}
+				})
+			})
+
+			Context("if the types are different", func() {
+				It("should return false", func() {
+					r := rand.New(rand.NewSource(time.Now().UnixNano()))
+					for trial := 0; trial < numTrials; trial++ {
+						x, ok := quick.Value(t, r)
+						Expect(ok).To(BeTrue())
+						xType := x.Interface().(pack.Type)
+						xTypeBytes, err := surge.ToBinary(xType)
+						Expect(err).ToNot(HaveOccurred())
+
+						var yType pack.Type
+						var yTypeBytes []byte
+						for yTypeBytes == nil || bytes.Equal(xTypeBytes, yTypeBytes) {
+							value := pack.Generate(r, 5, true, true)
+							yType = value.Interface().(pack.Value).Type()
+							yTypeBytes, err = surge.ToBinary(yType)
+							Expect(err).ToNot(HaveOccurred())
+						}
+
+						Expect(xType.Equals(yType)).To(BeFalse())
 					}
 				})
 			})
