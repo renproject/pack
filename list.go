@@ -62,6 +62,9 @@ func (v *List) Unmarshal(buf []byte, rem int) ([]byte, int, error) {
 	if err != nil {
 		return buf, rem, err
 	}
+	if len(v.Elems) == 0 {
+		v.T = typeNil{}
+	}
 	return buf, rem, nil
 }
 

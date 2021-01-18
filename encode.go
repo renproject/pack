@@ -12,6 +12,8 @@ func Encode(v interface{}) (Value, error) {
 	// If the interface is already a value, then immediately return the
 	// interface without modification.
 	switch v := v.(type) {
+	case Nil:
+		return v, nil
 	case Bool:
 		return v, nil
 	case U8:

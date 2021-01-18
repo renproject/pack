@@ -41,13 +41,13 @@ func (t typeNil) Equals(other Type) bool {
 }
 
 func (typeNil) UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error) {
-	value := Nil(struct{}{})
+	value := Nil{}
 	buf, rem, err := value.Unmarshal(buf, rem)
 	return value, buf, rem, err
 }
 
 func (typeNil) UnmarshalValueJSON(data []byte) (Value, error) {
-	value := Nil(struct{}{})
+	value := Nil{}
 	err := value.UnmarshalJSON(data)
 	return value, err
 }
@@ -1118,6 +1118,8 @@ func (t *typeList) UnmarshalJSON(data []byte) error {
 // binary.
 func SizeHintType(t Type) int {
 	switch t.Kind() {
+	case KindNil:
+		return t.SizeHint()
 	case KindBool:
 		return t.SizeHint()
 	case KindU8:
@@ -1150,6 +1152,8 @@ func SizeHintType(t Type) int {
 // MarshalType to binary.
 func MarshalType(t Type, buf []byte, rem int) ([]byte, int, error) {
 	switch t.Kind() {
+	case KindNil:
+		return t.Marshal(buf, rem)
 	case KindBool:
 		return t.Marshal(buf, rem)
 	case KindU8:
@@ -1194,6 +1198,9 @@ func UnmarshalType(t *Type, buf []byte, rem int) ([]byte, int, error) {
 		return buf, rem, err
 	}
 	switch kind {
+	case KindNil:
+		*t = typeNil{}
+		return buf, rem, nil
 	case KindBool:
 		*t = typeBool{}
 		return buf, rem, nil
@@ -1273,6 +1280,8 @@ func unmarshalTypeJSON(data []byte) (Type, error) {
 	kind := KindNil
 	if err := json.Unmarshal(data, &kind); err == nil {
 		switch kind {
+		case KindNil:
+			return typeNil{}, nil
 		case KindBool:
 			return typeBool{}, nil
 		case KindU8:

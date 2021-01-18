@@ -30,6 +30,8 @@ func Generate(r *rand.Rand, size int, allowStruct, allowList bool) reflect.Value
 func GenerateFromKind(r *rand.Rand, size int, kind Kind, allowStruct, allowList bool) reflect.Value {
 	t := reflect.Type(nil)
 	switch kind {
+	case KindNil:
+		t = reflect.TypeOf(Nil(struct{}{}))
 	case KindBool:
 		t = reflect.TypeOf(Bool(false))
 	case KindU8:
