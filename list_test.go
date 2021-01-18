@@ -6,14 +6,13 @@ import (
 
 	"github.com/renproject/pack"
 	"github.com/renproject/pack/packutil"
-	"github.com/renproject/surge"
 	"github.com/renproject/surge/surgeutil"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("List", func() {
+var _ = FDescribe("List", func() {
 
 	numTrials := 10
 
@@ -64,23 +63,6 @@ var _ = Describe("List", func() {
 				return true
 			}
 			Expect(quick.Check(f, nil)).To(Succeed())
-		})
-	})
-
-	Context("when constructing an empty list", func() {
-		It("should return an error", func() {
-			_, err := pack.NewList()
-			Expect(err).To(HaveOccurred())
-		})
-	})
-
-	Context("when unmarshaling an empty list", func() {
-		It("should return an error", func() {
-			list := pack.List{}
-			bytes, err := surge.ToBinary(list)
-			Expect(err).ToNot(HaveOccurred())
-			err = surge.FromBinary(&list, bytes)
-			Expect(err).To(HaveOccurred())
 		})
 	})
 })

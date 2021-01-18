@@ -16,7 +16,9 @@ type List struct {
 
 func NewList(vs ...Value) (List, error) {
 	if len(vs) == 0 {
-		return List{}, fmt.Errorf("cannot construct list with no elements")
+		return List{
+			T: typeNil{},
+		}, nil
 	}
 
 	elems := make([]Value, len(vs))
@@ -60,9 +62,6 @@ func (v *List) Unmarshal(buf []byte, rem int) ([]byte, int, error) {
 	if err != nil {
 		return buf, rem, err
 	}
-	if len(v.Elems) == 0 {
-		return buf, rem, fmt.Errorf("cannot construct list with no elements")
-	}
 	return buf, rem, nil
 }
 
@@ -92,9 +91,9 @@ func (v List) String() string {
 // See https://golang.org/pkg/testing/quick/#Generator for more information.
 // Generated lists will never contain embedded lists.
 func (List) Generate(r *rand.Rand, size int) reflect.Value {
-	// The list must contain at least one element.
-	if size == 0 {
-		size = 1
+	// Increase the likelihood of testing edge cases.
+	if size%10 == 0 {
+		size = 0
 	}
 	l := List{
 		T:     Generate(r, size, false, false).Interface().(Value).Type(),

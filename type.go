@@ -29,6 +29,73 @@ type Type interface {
 	UnmarshalValueJSON(data []byte) (Value, error)
 }
 
+type typeNil struct{}
+
+func (typeNil) Kind() Kind {
+	return KindNil
+}
+
+func (t typeNil) Equals(other Type) bool {
+	_, ok := other.(typeNil)
+	return ok
+}
+
+func (typeNil) UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error) {
+	value := Nil(struct{}{})
+	buf, rem, err := value.Unmarshal(buf, rem)
+	return value, buf, rem, err
+}
+
+func (typeNil) UnmarshalValueJSON(data []byte) (Value, error) {
+	value := Nil(struct{}{})
+	err := value.UnmarshalJSON(data)
+	return value, err
+}
+
+func (t typeNil) SizeHint() int {
+	return t.Kind().SizeHint()
+}
+
+func (t typeNil) Marshal(buf []byte, rem int) ([]byte, int, error) {
+	return t.Kind().Marshal(buf, rem)
+}
+
+func (t *typeNil) Unmarshal(buf []byte, rem int) ([]byte, int, error) {
+	var kind Kind
+	var err error
+	buf, rem, err = kind.Unmarshal(buf, rem)
+	if err != nil {
+		return buf, rem, err
+	}
+	if kind != t.Kind() {
+		return buf, rem, fmt.Errorf("unexpected kind: expected %v, got %v", t.Kind(), kind)
+	}
+	return buf, rem, nil
+}
+
+func (t typeNil) MarshalJSON() ([]byte, error) {
+	data, err := t.Kind().MarshalText()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(string(data))
+}
+
+func (t *typeNil) UnmarshalJSON(data []byte) error {
+	var text string
+	if err := json.Unmarshal(data, &text); err != nil {
+		return err
+	}
+	var kind Kind
+	if err := kind.UnmarshalText([]byte(text)); err != nil {
+		return err
+	}
+	if kind != t.Kind() {
+		return fmt.Errorf("unexpected kind: expected %v, got %v", t.Kind(), kind)
+	}
+	return nil
+}
+
 type typeBool struct{}
 
 func (typeBool) Kind() Kind {
