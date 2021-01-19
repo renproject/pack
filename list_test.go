@@ -44,6 +44,15 @@ var _ = Describe("List", func() {
 		})
 	})
 
+	Context("when marshaling and then unmarshaling", func() {
+		It("should return itself", func() {
+			for trial := 0; trial < numTrials; trial++ {
+				Expect(surgeutil.MarshalUnmarshalCheck(reflect.TypeOf(pack.List{}))).To(Succeed())
+				Expect(packutil.JSONMarshalUnmarshalCheck(reflect.TypeOf(pack.List{}))).To(Succeed())
+			}
+		})
+	})
+
 	Context("when getting type information", func() {
 		It("should return the list type", func() {
 			f := func(x pack.List) bool {
