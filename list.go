@@ -48,20 +48,139 @@ func (v List) Type() Type {
 // SizeHint returns the number of bytes required to represent the list in
 // binary.
 func (v List) SizeHint() int {
-	return surge.SizeHint(v.Elems)
+	return surge.SizeHint(v.Type()) + surge.SizeHint(v.Elems)
 }
 
 // Marshal the list into binary.
 func (v List) Marshal(buf []byte, rem int) ([]byte, int, error) {
+	buf, rem ,err := surge.Marshal(v.T.Kind(), buf, rem)
+	if err != nil {
+		return nil, 0, err
+	}
 	return surge.Marshal(v.Elems, buf, rem)
 }
 
 // Unmarshal the list from binary.
 func (v *List) Unmarshal(buf []byte, rem int) ([]byte, int, error) {
-	buf, rem, err := surge.Unmarshal(&v.Elems, buf, rem)
+	var kind Kind
+	buf, rem, err := surge.Unmarshal(&kind, buf, rem)
 	if err != nil {
 		return buf, rem, err
 	}
+
+	switch kind{
+	case KindBool:
+		elemts := []Bool{}
+		buf, rem, err := surge.Unmarshal(&elemts, buf, rem)
+		if err != nil {
+			return buf, rem, err
+		}
+		for i := range elemts{
+			v.Elems = append(v.Elems, elemts[i])
+		}
+	case KindNil:
+		elemts := []Nil{}
+		buf, rem, err := surge.Unmarshal(&elemts, buf, rem)
+		if err != nil {
+			return buf, rem, err
+		}
+		for i := range elemts{
+			v.Elems = append(v.Elems, elemts[i])
+		}
+	case KindU8:
+		elemts := []U8{}
+		buf, rem, err := surge.Unmarshal(&elemts, buf, rem)
+		if err != nil {
+			return buf, rem, err
+		}
+		for i := range elemts{
+			v.Elems = append(v.Elems, elemts[i])
+		}
+	case KindU16:
+		elemts := []U16{}
+		buf, rem, err := surge.Unmarshal(&elemts, buf, rem)
+		if err != nil {
+			return buf, rem, err
+		}
+		for i := range elemts{
+			v.Elems = append(v.Elems, elemts[i])
+		}
+	case KindU32:
+		elemts := []U32{}
+		buf, rem, err := surge.Unmarshal(&elemts, buf, rem)
+		if err != nil {
+			return buf, rem, err
+		}
+		for i := range elemts{
+			v.Elems = append(v.Elems, elemts[i])
+		}
+	case KindU64:
+		elemts := []U64{}
+		buf, rem, err := surge.Unmarshal(&elemts, buf, rem)
+		if err != nil {
+			return buf, rem, err
+		}
+		for i := range elemts{
+			v.Elems = append(v.Elems, elemts[i])
+		}
+	case KindU128:
+		elemts := []U128{}
+		buf, rem, err := surge.Unmarshal(&elemts, buf, rem)
+		if err != nil {
+			return buf, rem, err
+		}
+		for i := range elemts{
+			v.Elems = append(v.Elems, elemts[i])
+		}
+	case KindU256:
+		elemts := []U256{}
+		buf, rem, err := surge.Unmarshal(&elemts, buf, rem)
+		if err != nil {
+			return buf, rem, err
+		}
+		for i := range elemts{
+			v.Elems = append(v.Elems, elemts[i])
+		}
+	case KindString:
+		elemts := []String{}
+		buf, rem, err := surge.Unmarshal(&elemts, buf, rem)
+		if err != nil {
+			return buf, rem, err
+		}
+		for i := range elemts{
+			v.Elems = append(v.Elems, elemts[i])
+		}
+	case KindBytes:
+		elemts := []Bytes{}
+		buf, rem, err := surge.Unmarshal(&elemts, buf, rem)
+		if err != nil {
+			return buf, rem, err
+		}
+		for i := range elemts{
+			v.Elems = append(v.Elems, elemts[i])
+		}
+	case KindBytes32:
+		elemts := []Bytes32{}
+		buf, rem, err := surge.Unmarshal(&elemts, buf, rem)
+		if err != nil {
+			return buf, rem, err
+		}
+		for i := range elemts{
+			v.Elems = append(v.Elems, elemts[i])
+		}
+	case KindBytes65:
+		elemts := []Bytes65{}
+		buf, rem, err := surge.Unmarshal(&elemts, buf, rem)
+		if err != nil {
+			return buf, rem, err
+		}
+		for i := range elemts{
+			v.Elems = append(v.Elems, elemts[i])
+		}
+	case KindStruct:
+		// TODO :
+	}
+
 	if len(v.Elems) == 0 {
 		v.T = typeNil{}
 		return buf, rem, nil
