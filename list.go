@@ -64,6 +64,13 @@ func (v *List) Unmarshal(buf []byte, rem int) ([]byte, int, error) {
 	}
 	if len(v.Elems) == 0 {
 		v.T = typeNil{}
+		return buf, rem, nil
+	}
+	v.T = v.Elems[0].Type()
+	for i := range v.Elems {
+		if !v.Elems[i].Type().Equals(v.T) {
+			return buf, rem, fmt.Errorf("unexpected type: expected %v, got %v", v.T, v.Elems[i].Type())
+		}
 	}
 	return buf, rem, nil
 }
@@ -94,10 +101,6 @@ func (v List) String() string {
 // See https://golang.org/pkg/testing/quick/#Generator for more information.
 // Generated lists will never contain embedded lists.
 func (List) Generate(r *rand.Rand, size int) reflect.Value {
-	// Increase the likelihood of testing edge cases.
-	if size%10 == 0 {
-		size = 0
-	}
 	l := List{
 		T:     Generate(r, size, false, false).Interface().(Value).Type(),
 		Elems: make([]Value, 0, size),
