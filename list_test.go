@@ -1,6 +1,7 @@
 package pack_test
 
 import (
+	"encoding/json"
 	"math/rand"
 	"reflect"
 	"testing/quick"
@@ -91,6 +92,23 @@ var _ = Describe("List", func() {
 					T: x.T,
 				}
 				err = surge.FromBinary(&y, data)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(y).To(Equal(x))
+				return true
+			}
+			Expect(quick.Check(f, nil)).To(Succeed())
+		})
+	})
+
+	Context("when marshaling and unmarshaling to JSON", func() {
+		It("should equal itself", func() {
+			f := func(x pack.List) bool {
+				data, err := json.Marshal(x)
+				Expect(err).ToNot(HaveOccurred())
+				y := pack.List{
+					T: x.T,
+				}
+				err = json.Unmarshal(data, &y)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(y).To(Equal(x))
 				return true
