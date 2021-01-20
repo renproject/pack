@@ -3,7 +3,6 @@ package pack_test
 import (
 	"encoding/json"
 	"math/rand"
-	"time"
 
 	"github.com/renproject/pack"
 	"github.com/renproject/surge"
@@ -17,7 +16,7 @@ var _ = Describe("Kind", func() {
 	numTrials := 100
 
 	randomKind := func() pack.Kind {
-		r := rand.New(rand.NewSource(time.Now().UnixNano()))
+		r := rand.New(rand.NewSource(GinkgoRandomSeed()))
 		switch r.Int() % 13 {
 		// Nil
 		case 0:

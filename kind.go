@@ -17,7 +17,7 @@ import (
 type Kind uint8
 
 const (
-	// KindNil is the kind for elements within an empty List.
+	// KindNil should never be used.
 	KindNil = Kind(0)
 
 	// KindBool is the kind of all Bool values.

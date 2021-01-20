@@ -12,8 +12,6 @@ func Encode(v interface{}) (Value, error) {
 	// If the interface is already a value, then immediately return the
 	// interface without modification.
 	switch v := v.(type) {
-	case Nil:
-		return v, nil
 	case Bool:
 		return v, nil
 	case U8:
@@ -63,6 +61,14 @@ func Encode(v interface{}) (Value, error) {
 	case reflect.Slice:
 		if valueOf.Type().Elem().Kind() == reflect.Uint8 {
 			return NewBytes(valueOf.Bytes()), nil
+		}
+		if valueOf.Len() == 0 {
+			elem := reflect.Zero(valueOf.Type().Elem()).Interface()
+			val, err := Encode(elem)
+			if err != nil {
+				return nil, fmt.Errorf("encoding list item: %v", err)
+			}
+			return EmptyList(val.Type()), nil
 		}
 		var err error
 		elems := make([]Value, valueOf.Len())
