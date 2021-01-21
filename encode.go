@@ -62,6 +62,14 @@ func Encode(v interface{}) (Value, error) {
 		if valueOf.Type().Elem().Kind() == reflect.Uint8 {
 			return NewBytes(valueOf.Bytes()), nil
 		}
+		if valueOf.Len() == 0 {
+			elem := reflect.Zero(valueOf.Type().Elem()).Interface()
+			val, err := Encode(elem)
+			if err != nil {
+				return nil, fmt.Errorf("encoding list item: %v", err)
+			}
+			return EmptyList(val.Type()), nil
+		}
 		var err error
 		elems := make([]Value, valueOf.Len())
 		for i := 0; i < valueOf.Len(); i++ {

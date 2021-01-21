@@ -14,6 +14,13 @@ type List struct {
 	Elems []Value
 }
 
+func EmptyList(t Type) List {
+	return List{
+		T:     t,
+		Elems: []Value{},
+	}
+}
+
 func NewList(vs ...Value) (List, error) {
 	if len(vs) == 0 {
 		return List{}, fmt.Errorf("cannot construct list with no elements")
@@ -51,18 +58,44 @@ func (v List) SizeHint() int {
 
 // Marshal the list into binary.
 func (v List) Marshal(buf []byte, rem int) ([]byte, int, error) {
-	return surge.Marshal(v.Elems, buf, rem)
+	buf, rem, err := surge.MarshalLen(uint32(len(v.Elems)), buf, rem)
+	if err != nil {
+		return buf, rem, err
+	}
+	for i := range v.Elems {
+		buf, rem, err = v.Elems[i].Marshal(buf, rem)
+		if err != nil {
+			return buf, rem, err
+		}
+	}
+	return buf, rem, nil
 }
 
 // Unmarshal the list from binary.
 func (v *List) Unmarshal(buf []byte, rem int) ([]byte, int, error) {
-	buf, rem, err := surge.Unmarshal(&v.Elems, buf, rem)
+	if v.T == nil {
+		return buf, rem, fmt.Errorf("cannot unmarshal into list with unknown type")
+	}
+
+	var numElems uint32
+	buf, rem, err := surge.UnmarshalLen(&numElems, 0, buf, rem)
 	if err != nil {
 		return buf, rem, err
 	}
-	if len(v.Elems) == 0 {
-		return buf, rem, fmt.Errorf("cannot construct list with no elements")
+
+	v.Elems = make([]Value, numElems)
+	for i := range v.Elems {
+		v.Elems[i], buf, rem, err = v.T.UnmarshalValue(buf, rem)
+		if err != nil {
+			return buf, rem, err
+		}
+
+		// Ensure all elements are of the same type.
+		if v.Elems[i].Type() != v.T {
+			return buf, rem, fmt.Errorf("unexpected type: expected %v, got %v", v.T, v.Elems[i].Type())
+		}
 	}
+
 	return buf, rem, nil
 }
 
@@ -92,10 +125,6 @@ func (v List) String() string {
 // See https://golang.org/pkg/testing/quick/#Generator for more information.
 // Generated lists will never contain embedded lists.
 func (List) Generate(r *rand.Rand, size int) reflect.Value {
-	// The list must contain at least one element.
-	if size == 0 {
-		size = 1
-	}
 	l := List{
 		T:     Generate(r, size, false, false).Interface().(Value).Type(),
 		Elems: make([]Value, 0, size),
