@@ -25,15 +25,6 @@ var _ = Describe("Struct", func() {
 		})
 	})
 
-	Context("when marshaling and then unmarshaling", func() {
-		It("should return itself", func() {
-			for trial := 0; trial < numTrials; trial++ {
-				Expect(surgeutil.MarshalUnmarshalCheck(reflect.TypeOf(pack.Struct{}))).To(Succeed())
-				Expect(packutil.JSONMarshalUnmarshalCheck(reflect.TypeOf(pack.Struct{}))).To(Succeed())
-			}
-		})
-	})
-
 	Context("when marshaling", func() {
 		Context("when the buffer is too small", func() {
 			It("should return itself", func() {

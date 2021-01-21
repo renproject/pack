@@ -105,10 +105,7 @@ var _ = Describe("List", func() {
 			f := func(x pack.List) bool {
 				data, err := json.Marshal(x)
 				Expect(err).ToNot(HaveOccurred())
-				y := pack.List{
-					T: x.T,
-				}
-				err = json.Unmarshal(data, &y)
+				y, err := x.Type().UnmarshalValueJSON(data)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(y).To(Equal(x))
 				return true
