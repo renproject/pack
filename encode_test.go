@@ -147,7 +147,8 @@ var _ = Describe("Encoding", func() {
 		It("should equal itself", func() {
 			var x pack.Value
 
-			x = pack.NewBool(false)
+			r := rand.New(rand.NewSource(GinkgoRandomSeed()))
+			x = pack.Generate(r, 1, true, true).Interface().(pack.Value)
 			encoded, err := pack.Encode(x)
 			Expect(err).ToNot(HaveOccurred())
 
