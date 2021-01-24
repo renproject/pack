@@ -7,9 +7,10 @@ import (
 	"testing/quick"
 	"time"
 
+	"github.com/renproject/pack"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/renproject/pack"
 )
 
 var _ = Describe("Encoding", func() {
@@ -141,4 +142,21 @@ var _ = Describe("Encoding", func() {
 			})
 		})
 	}
+
+	Context("when encoding and then decoding a value", func() {
+		It("should equal itself", func() {
+			r := rand.New(rand.NewSource(GinkgoRandomSeed()))
+
+			var x pack.Value
+			x = pack.Generate(r, 1, true, true).Interface().(pack.Value)
+			encoded, err := pack.Encode(x)
+			Expect(err).ToNot(HaveOccurred())
+
+			var y pack.Value
+			err = pack.Decode(&y, encoded)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(reflect.DeepEqual(x, y)).To(BeTrue())
+		})
+	})
 })
