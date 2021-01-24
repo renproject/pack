@@ -40,6 +40,8 @@ func Encode(v interface{}) (Value, error) {
 		return v, nil
 	case Typed:
 		return v, nil
+	case Value:
+		return v, nil
 	}
 
 	// Otherwise, reflect on the kind/type of the interface, and convert it into
@@ -214,6 +216,12 @@ func Decode(interf interface{}, v Value) error {
 		}
 		if v, ok := v.(Struct); ok {
 			*interf = Typed(v)
+			return nil
+		}
+		return fmt.Errorf("unexpected value of type %T", v)
+	case *Value:
+		if v, ok := v.(Value); ok {
+			*interf = v
 			return nil
 		}
 		return fmt.Errorf("unexpected value of type %T", v)
