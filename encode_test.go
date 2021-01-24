@@ -145,9 +145,9 @@ var _ = Describe("Encoding", func() {
 
 	Context("when encoding and then decoding a value", func() {
 		It("should equal itself", func() {
-			var x pack.Value
-
 			r := rand.New(rand.NewSource(GinkgoRandomSeed()))
+
+			var x pack.Value
 			x = pack.Generate(r, 1, true, true).Interface().(pack.Value)
 			encoded, err := pack.Encode(x)
 			Expect(err).ToNot(HaveOccurred())
@@ -155,6 +155,8 @@ var _ = Describe("Encoding", func() {
 			var y pack.Value
 			err = pack.Decode(&y, encoded)
 			Expect(err).ToNot(HaveOccurred())
+
+			Expect(reflect.DeepEqual(x, y)).To(BeTrue())
 		})
 	})
 })
