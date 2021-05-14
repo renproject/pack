@@ -39,7 +39,7 @@ func Encode(v interface{}) (Value, error) {
 	case List:
 		return v, nil
 	case Typed:
-		return v, nil
+		return Struct(v), nil
 	case Value:
 		return v, nil
 	}
