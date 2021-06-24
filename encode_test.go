@@ -163,10 +163,10 @@ var _ = Describe("Encoding", func() {
 			var x A
 			err = pack.Decode(&x, v)
 			Expect(err).ToNot(HaveOccurred())
-			var y A
+			var y B
 			err = pack.Decode(&y, v)
 			Expect(err).ToNot(HaveOccurred())
-			var z A
+			var z C
 			err = pack.Decode(&z, v)
 			Expect(err).ToNot(HaveOccurred())
 		})
