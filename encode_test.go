@@ -138,42 +138,14 @@ var _ = Describe("Encoding", func() {
 	})
 
 	type PartialStruct struct {
-		Y    pack.U64 `json:"y"`
-		Omit pack.U64 `json:"z,omitempty"`
-		Dash pack.U64 `json:"-"`
-
-		Foo pack.String  `json:"foo"`
-		Boo pack.Bytes65 `json:"boo"`
-
-		Inner struct {
-			InnerX       pack.U64 `json:"x"`
-			InnerUnnamed pack.U64
-		} `json:"inner"`
-
-		List pack.List `json:"list"`
+		Foo pack.String `json:"foo"`
 	}
 
 	type Struct struct {
-		X       pack.U64 `json:"x"`
-		Y       pack.U64 `json:"y"`
-		Omit    pack.U64 `json:"z,omitempty"`
-		Dash    pack.U64 `json:"-"`
-		Unnamed pack.U64
-
-		Foo pack.String  `json:"foo"`
-		Bar pack.Bytes   `json:"bar"`
-		Baz pack.Bytes32 `json:"baz"`
-		Boo pack.Bytes65 `json:"boo"`
-
-		Inner struct {
-			InnerX       pack.U64 `json:"x"`
-			InnerY       pack.U64 `json:"y"`
-			InnerOmit    pack.U64 `json:"z,omitempty"`
-			InnerDash    pack.U64 `json:"-"`
-			InnerUnnamed pack.U64
-		} `json:"inner"`
-
-		List pack.List `json:"list"`
+		Foo pack.U64    `json:"foo"`
+		Bar pack.String `json:"bar"`
+		Baz pack.Bytes  `json:"baz"`
+		Boo pack.List   `json:"boo"`
 	}
 
 	Context("when decoding into a struct with new fields", func() {
