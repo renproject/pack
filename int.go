@@ -515,6 +515,9 @@ func (u128 U128) Bytes() []byte {
 }
 
 func (u128 U128) Add(other U128) U128 {
+	if u128.inner == nil {
+		u128.inner = new(big.Int)
+	}
 	ret := U128{inner: new(big.Int)}
 	if other.inner == nil {
 		ret.inner.Set(u128.inner)
@@ -528,6 +531,9 @@ func (u128 U128) Add(other U128) U128 {
 }
 
 func (u128 U128) Sub(other U128) U128 {
+	if u128.inner == nil {
+		u128.inner = new(big.Int)
+	}
 	ret := U128{inner: new(big.Int)}
 	if other.inner == nil {
 		ret.inner.Set(u128.inner)
@@ -541,6 +547,9 @@ func (u128 U128) Sub(other U128) U128 {
 }
 
 func (u128 U128) Mul(other U128) U128 {
+	if u128.inner == nil {
+		u128.inner = new(big.Int)
+	}
 	ret := U128{inner: new(big.Int)}
 	if other.inner == nil {
 		ret.inner.Set(u128.inner)
@@ -554,6 +563,9 @@ func (u128 U128) Mul(other U128) U128 {
 }
 
 func (u128 U128) Div(other U128) U128 {
+	if u128.inner == nil {
+		u128.inner = new(big.Int)
+	}
 	ret := U128{inner: new(big.Int)}
 	if other.inner == nil {
 		ret.inner.Set(u128.inner)
@@ -767,6 +779,9 @@ func (u256 U256) Bytes() []byte {
 }
 
 func (u256 U256) Add(other U256) U256 {
+	if u256.inner == nil {
+		u256.inner = new(big.Int)
+	}
 	ret := U256{inner: new(big.Int)}
 	if other.inner == nil {
 		ret.inner.Set(u256.inner)
@@ -780,6 +795,9 @@ func (u256 U256) Add(other U256) U256 {
 }
 
 func (u256 U256) Sub(other U256) U256 {
+	if u256.inner == nil {
+		u256.inner = new(big.Int)
+	}
 	ret := U256{inner: new(big.Int)}
 	if other.inner == nil {
 		ret.inner.Set(u256.inner)
@@ -793,6 +811,9 @@ func (u256 U256) Sub(other U256) U256 {
 }
 
 func (u256 U256) Mul(other U256) U256 {
+	if u256.inner == nil {
+		u256.inner = new(big.Int)
+	}
 	ret := U256{inner: new(big.Int)}
 	if other.inner == nil {
 		ret.inner.Set(u256.inner)
@@ -806,6 +827,9 @@ func (u256 U256) Mul(other U256) U256 {
 }
 
 func (u256 U256) Div(other U256) U256 {
+	if u256.inner == nil {
+		u256.inner = new(big.Int)
+	}
 	ret := U256{inner: new(big.Int)}
 	if other.inner == nil {
 		ret.inner.Set(u256.inner)
