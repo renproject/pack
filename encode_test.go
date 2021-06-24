@@ -138,22 +138,36 @@ var _ = Describe("Encoding", func() {
 	})
 
 	type PartialStruct struct {
-		Foo pack.String `json:"foo"`
+		Foo pack.U64 `json:"foo"`
 	}
 
-	type Struct struct {
+	type A struct {
 		Foo pack.U64    `json:"foo"`
 		Bar pack.String `json:"bar"`
-		Baz pack.Bytes  `json:"baz"`
-		Boo pack.List   `json:"boo"`
+	}
+
+	type B struct {
+		Foo pack.U64   `json:"foo"`
+		Baz pack.Bytes `json:"baz"`
+	}
+
+	type C struct {
+		Foo pack.U64  `json:"foo"`
+		Boo pack.List `json:"boo"`
 	}
 
 	Context("when decoding into a struct with new fields", func() {
 		It("should not error", func() {
 			v, err := pack.Encode(PartialStruct{})
 			Expect(err).ToNot(HaveOccurred())
-			var x Struct
+			var x A
 			err = pack.Decode(&x, v)
+			Expect(err).ToNot(HaveOccurred())
+			var y A
+			err = pack.Decode(&y, v)
+			Expect(err).ToNot(HaveOccurred())
+			var z A
+			err = pack.Decode(&z, v)
 			Expect(err).ToNot(HaveOccurred())
 		})
 	})
