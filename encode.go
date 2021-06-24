@@ -333,9 +333,8 @@ func Decode(interf interface{}, v Value) error {
 				}
 			}
 			if name != "" {
-				// If the field is equivalent to the zero element, do not decode
-				// it.
-				if reflect.DeepEqual(elem.Field(i).Interface(), reflect.Zero(elem.Field(i).Type()).Interface()) {
+				// If the struct value is nil, do not decode it.
+				if structOrTyped.Get(name) == nil {
 					continue
 				}
 				if err := Decode(elem.Field(i).Addr().Interface(), structOrTyped.Get(name)); err != nil {
