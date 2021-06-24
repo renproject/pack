@@ -92,7 +92,7 @@ var _ = Describe("Encoding", func() {
 			List pack.List `json:"list"`
 		}{}),
 	}
-	numTrials := 10
+	numTrials := 100
 
 	for _, t := range ts {
 		t := t
@@ -103,29 +103,6 @@ var _ = Describe("Encoding", func() {
 				for trial := 0; trial < numTrials; trial++ {
 					x, ok := quick.Value(t, r)
 					Expect(ok).To(BeTrue())
-
-					// Ensure there are no empty slices generated as they will
-					// return an error when encoding.
-					switch t.Kind() {
-					case reflect.Slice:
-						if x.Len() == 0 {
-							continue
-						}
-					case reflect.Struct:
-						emptySlice := false
-						for i := 0; i < x.NumField(); i++ {
-							switch x.Field(i).Kind() {
-							case reflect.Slice:
-								if x.Field(i).Len() == 0 {
-									emptySlice = true
-									break
-								}
-							}
-						}
-						if emptySlice {
-							continue
-						}
-					}
 
 					v, err := pack.Encode(x.Interface())
 					Expect(err).ToNot(HaveOccurred())
@@ -157,6 +134,55 @@ var _ = Describe("Encoding", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(reflect.DeepEqual(x, y)).To(BeTrue())
+		})
+	})
+
+	type PartialStruct struct {
+		Y    pack.U64 `json:"y"`
+		Omit pack.U64 `json:"z,omitempty"`
+		Dash pack.U64 `json:"-"`
+
+		Foo pack.String  `json:"foo"`
+		Boo pack.Bytes65 `json:"boo"`
+
+		Inner struct {
+			InnerX       pack.U64 `json:"x"`
+			InnerUnnamed pack.U64
+		} `json:"inner"`
+
+		List pack.List `json:"list"`
+	}
+
+	type Struct struct {
+		X       pack.U64 `json:"x"`
+		Y       pack.U64 `json:"y"`
+		Omit    pack.U64 `json:"z,omitempty"`
+		Dash    pack.U64 `json:"-"`
+		Unnamed pack.U64
+
+		Foo pack.String  `json:"foo"`
+		Bar pack.Bytes   `json:"bar"`
+		Baz pack.Bytes32 `json:"baz"`
+		Boo pack.Bytes65 `json:"boo"`
+
+		Inner struct {
+			InnerX       pack.U64 `json:"x"`
+			InnerY       pack.U64 `json:"y"`
+			InnerOmit    pack.U64 `json:"z,omitempty"`
+			InnerDash    pack.U64 `json:"-"`
+			InnerUnnamed pack.U64
+		} `json:"inner"`
+
+		List pack.List `json:"list"`
+	}
+
+	Context("when decoding into a struct with new fields", func() {
+		It("should not error", func() {
+			v, err := pack.Encode(PartialStruct{})
+			Expect(err).ToNot(HaveOccurred())
+			var x Struct
+			err = pack.Decode(&x, v)
+			Expect(err).ToNot(HaveOccurred())
 		})
 	})
 })

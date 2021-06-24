@@ -280,15 +280,11 @@ func Decode(interf interface{}, v Value) error {
 			}
 			return fmt.Errorf("unexpected value of type %T", v)
 		}
-		if v, ok := v.(List); ok {
-			elem.Set(reflect.MakeSlice(typeOf, len(v.Elems), len(v.Elems)))
-			for i := 0; i < len(v.Elems); i++ {
-				if err := Decode(elem.Index(i).Addr().Interface(), v.Elems[i]); err != nil {
-					return fmt.Errorf("decoding list item: %v", err)
-				}
+		elem.Set(reflect.MakeSlice(typeOf, len(v.(List).Elems), len(v.(List).Elems)))
+		for i := 0; i < len(v.(List).Elems); i++ {
+			if err := Decode(elem.Index(i).Addr().Interface(), v.(List).Elems[i]); err != nil {
+				return fmt.Errorf("decoding list item: %v", err)
 			}
-		} else {
-			elem.Set(reflect.MakeSlice(typeOf, 0, 0))
 		}
 		return nil
 	case reflect.Array:
@@ -337,6 +333,11 @@ func Decode(interf interface{}, v Value) error {
 				}
 			}
 			if name != "" {
+				// If the field is equivalent to the zero element, do not decode
+				// it.
+				if reflect.DeepEqual(elem.Field(i).Interface(), reflect.Zero(elem.Field(i).Type()).Interface()) {
+					continue
+				}
 				if err := Decode(elem.Field(i).Addr().Interface(), structOrTyped.Get(name)); err != nil {
 					return fmt.Errorf("decoding \"%v\": %v", f.Name, err)
 				}
