@@ -515,6 +515,9 @@ func (u128 U128) Bytes() []byte {
 }
 
 func (u128 U128) Add(other U128) U128 {
+	if u128.inner == nil {
+		u128.inner = new(big.Int)
+	}
 	ret := U128{inner: new(big.Int)}
 	if other.inner == nil {
 		ret.inner.Set(u128.inner)
@@ -528,6 +531,9 @@ func (u128 U128) Add(other U128) U128 {
 }
 
 func (u128 U128) Sub(other U128) U128 {
+	if u128.inner == nil {
+		u128.inner = new(big.Int)
+	}
 	ret := U128{inner: new(big.Int)}
 	if other.inner == nil {
 		ret.inner.Set(u128.inner)
@@ -541,6 +547,9 @@ func (u128 U128) Sub(other U128) U128 {
 }
 
 func (u128 U128) Mul(other U128) U128 {
+	if u128.inner == nil {
+		u128.inner = new(big.Int)
+	}
 	ret := U128{inner: new(big.Int)}
 	if other.inner == nil {
 		ret.inner.Set(u128.inner)
@@ -554,6 +563,9 @@ func (u128 U128) Mul(other U128) U128 {
 }
 
 func (u128 U128) Div(other U128) U128 {
+	if u128.inner == nil {
+		u128.inner = new(big.Int)
+	}
 	ret := U128{inner: new(big.Int)}
 	if other.inner == nil {
 		ret.inner.Set(u128.inner)
@@ -647,6 +659,9 @@ func (u128 U128) Marshal(buf []byte, rem int) ([]byte, int, error) {
 	if len(buf) < 16 || rem < 16 {
 		return buf, rem, surge.ErrUnexpectedEndOfBuffer
 	}
+	if u128.inner == nil {
+		u128.inner = new(big.Int)
+	}
 	b16 := paddedTo16(u128.inner)
 	copy(buf, b16[:])
 	return buf[16:], rem - 16, nil
@@ -666,6 +681,9 @@ func (u128 *U128) Unmarshal(buf []byte, rem int) ([]byte, int, error) {
 }
 
 func (u128 U128) MarshalJSON() ([]byte, error) {
+	if u128.inner == nil {
+		u128.inner = new(big.Int)
+	}
 	return json.Marshal(u128.String())
 }
 
@@ -767,6 +785,9 @@ func (u256 U256) Bytes() []byte {
 }
 
 func (u256 U256) Add(other U256) U256 {
+	if u256.inner == nil {
+		u256.inner = new(big.Int)
+	}
 	ret := U256{inner: new(big.Int)}
 	if other.inner == nil {
 		ret.inner.Set(u256.inner)
@@ -780,6 +801,9 @@ func (u256 U256) Add(other U256) U256 {
 }
 
 func (u256 U256) Sub(other U256) U256 {
+	if u256.inner == nil {
+		u256.inner = new(big.Int)
+	}
 	ret := U256{inner: new(big.Int)}
 	if other.inner == nil {
 		ret.inner.Set(u256.inner)
@@ -793,6 +817,9 @@ func (u256 U256) Sub(other U256) U256 {
 }
 
 func (u256 U256) Mul(other U256) U256 {
+	if u256.inner == nil {
+		u256.inner = new(big.Int)
+	}
 	ret := U256{inner: new(big.Int)}
 	if other.inner == nil {
 		ret.inner.Set(u256.inner)
@@ -806,6 +833,9 @@ func (u256 U256) Mul(other U256) U256 {
 }
 
 func (u256 U256) Div(other U256) U256 {
+	if u256.inner == nil {
+		u256.inner = new(big.Int)
+	}
 	ret := U256{inner: new(big.Int)}
 	if other.inner == nil {
 		ret.inner.Set(u256.inner)
@@ -899,6 +929,9 @@ func (u256 U256) Marshal(buf []byte, rem int) ([]byte, int, error) {
 	if len(buf) < 32 || rem < 32 {
 		return buf, rem, surge.ErrUnexpectedEndOfBuffer
 	}
+	if u256.inner == nil {
+		u256.inner = new(big.Int)
+	}
 	b32 := paddedTo32(u256.inner)
 	copy(buf, b32[:])
 	return buf[32:], rem - 32, nil
@@ -918,6 +951,9 @@ func (u256 *U256) Unmarshal(buf []byte, rem int) ([]byte, int, error) {
 }
 
 func (u256 U256) MarshalJSON() ([]byte, error) {
+	if u256.inner == nil {
+		u256.inner = new(big.Int)
+	}
 	return json.Marshal(u256.String())
 }
 

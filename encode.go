@@ -7,7 +7,13 @@ import (
 )
 
 // Encode a Go interface into a Value interface.
-func Encode(v interface{}) (Value, error) {
+func Encode(v interface{}) (val Value, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("recovered: %v", err)
+			return
+		}
+	}()
 
 	// If the interface is already a value, then immediately return the
 	// interface without modification.
@@ -126,7 +132,13 @@ func Encode(v interface{}) (Value, error) {
 
 // Decode a Value interface into a Go interface. The Go interface must be a
 // pointer.
-func Decode(interf interface{}, v Value) error {
+func Decode(interf interface{}, v Value) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("recovered: %v", err)
+			return
+		}
+	}()
 
 	// If the interface-to-be-decoded-into is a value, then check the type of
 	// the value-to-be-decoded, and assign.
@@ -333,6 +345,10 @@ func Decode(interf interface{}, v Value) error {
 				}
 			}
 			if name != "" {
+				// If the struct value is nil, do not decode it.
+				if structOrTyped.Get(name) == nil {
+					continue
+				}
 				if err := Decode(elem.Field(i).Addr().Interface(), structOrTyped.Get(name)); err != nil {
 					return fmt.Errorf("decoding \"%v\": %v", f.Name, err)
 				}

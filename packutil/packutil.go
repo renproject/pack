@@ -68,6 +68,11 @@ func AddZeroCheck(t reflect.Type) error {
 	if !result[0].Bool() {
 		return fmt.Errorf("unequal after adding zero")
 	}
+	result = y.MethodByName("Add").Call([]reflect.Value{x})
+	result = result[0].MethodByName("Equal").Call([]reflect.Value{x})
+	if !result[0].Bool() {
+		return fmt.Errorf("unequal after adding zero")
+	}
 	// AddAssign zero
 	before := x.Interface().(fmt.Stringer).String()
 	xPtr := reflect.New(t)

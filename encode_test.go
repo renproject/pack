@@ -92,7 +92,7 @@ var _ = Describe("Encoding", func() {
 			List pack.List `json:"list"`
 		}{}),
 	}
-	numTrials := 10
+	numTrials := 100
 
 	for _, t := range ts {
 		t := t
@@ -103,29 +103,6 @@ var _ = Describe("Encoding", func() {
 				for trial := 0; trial < numTrials; trial++ {
 					x, ok := quick.Value(t, r)
 					Expect(ok).To(BeTrue())
-
-					// Ensure there are no empty slices generated as they will
-					// return an error when encoding.
-					switch t.Kind() {
-					case reflect.Slice:
-						if x.Len() == 0 {
-							continue
-						}
-					case reflect.Struct:
-						emptySlice := false
-						for i := 0; i < x.NumField(); i++ {
-							switch x.Field(i).Kind() {
-							case reflect.Slice:
-								if x.Field(i).Len() == 0 {
-									emptySlice = true
-									break
-								}
-							}
-						}
-						if emptySlice {
-							continue
-						}
-					}
 
 					v, err := pack.Encode(x.Interface())
 					Expect(err).ToNot(HaveOccurred())
@@ -157,6 +134,41 @@ var _ = Describe("Encoding", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(reflect.DeepEqual(x, y)).To(BeTrue())
+		})
+	})
+
+	type PartialStruct struct {
+		Foo pack.U64 `json:"foo"`
+	}
+
+	type A struct {
+		Foo pack.U64    `json:"foo"`
+		Bar pack.String `json:"bar"`
+	}
+
+	type B struct {
+		Foo pack.U64   `json:"foo"`
+		Baz pack.Bytes `json:"baz"`
+	}
+
+	type C struct {
+		Foo pack.U64  `json:"foo"`
+		Boo pack.List `json:"boo"`
+	}
+
+	Context("when decoding into a struct with new fields", func() {
+		It("should not error", func() {
+			v, err := pack.Encode(PartialStruct{})
+			Expect(err).ToNot(HaveOccurred())
+			var x A
+			err = pack.Decode(&x, v)
+			Expect(err).ToNot(HaveOccurred())
+			var y B
+			err = pack.Decode(&y, v)
+			Expect(err).ToNot(HaveOccurred())
+			var z C
+			err = pack.Decode(&z, v)
+			Expect(err).ToNot(HaveOccurred())
 		})
 	})
 })
