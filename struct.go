@@ -75,7 +75,7 @@ func NewStruct(vs ...interface{}) Struct {
 // Type returns the structured record type. This method has O(n) complexity,
 // where N is the number of fields in the struct.
 func (v Struct) Type() Type {
-	t := typeStruct{}
+	t := make(typeStruct, 0, len(v))
 	for _, field := range v {
 		t = append(t, typeStructField{Name: field.Name, Type: field.Value.Type()})
 	}
