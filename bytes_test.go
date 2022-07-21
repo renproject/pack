@@ -435,7 +435,7 @@ var _ = Describe("Bytes", func() {
 
 	Context("when getting type information for byte64 arrays", func() {
 		It("should return the 64-byte array type", func() {
-			Expect(pack.NewBytes64([64]byte{}).Type().Kind()).To(Equal(pack.KindBytes65))
+			Expect(pack.NewBytes64([64]byte{}).Type().Kind()).To(Equal(pack.KindBytes64))
 		})
 	})
 })
