@@ -40,6 +40,8 @@ func Encode(v interface{}) (val Value, err error) {
 		return v, nil
 	case Bytes65:
 		return v, nil
+	case Bytes64:
+		return v, nil
 	case Struct:
 		return v, nil
 	case List:
@@ -95,6 +97,9 @@ func Encode(v interface{}) (val Value, err error) {
 			}
 			if typeOf.Len() == 65 {
 				return valueOf.Convert(reflect.TypeOf(Bytes65{})).Interface().(Bytes65), nil
+			}
+			if typeOf.Len() == 64 {
+				return valueOf.Convert(reflect.TypeOf(Bytes64{})).Interface().(Bytes64), nil
 			}
 		}
 		return nil, fmt.Errorf("non-exhaustive pattern: type %T", v)
@@ -209,6 +214,12 @@ func Decode(interf interface{}, v Value) (err error) {
 			return nil
 		}
 		return fmt.Errorf("unexpected value of type %T", v)
+	case *Bytes64:
+		if v, ok := v.(Bytes64); ok {
+			*interf = v
+			return nil
+		}
+		return fmt.Errorf("unexpected value of type %T", v)
 	case *Struct:
 		if v, ok := v.(Struct); ok {
 			*interf = v
@@ -311,6 +322,13 @@ func Decode(interf interface{}, v Value) (err error) {
 			}
 			if typeOf.Len() == 65 {
 				if v, ok := v.(Bytes65); ok {
+					elem.Set(reflect.ValueOf(v).Convert(typeOf))
+					return nil
+				}
+				return fmt.Errorf("unexpected value of type %T", v)
+			}
+			if typeOf.Len() == 64 {
+				if v, ok := v.(Bytes64); ok {
 					elem.Set(reflect.ValueOf(v).Convert(typeOf))
 					return nil
 				}

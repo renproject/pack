@@ -25,6 +25,7 @@ var _ = Describe("Bytes", func() {
 		reflect.TypeOf(pack.NewBytes([]byte{})),
 		reflect.TypeOf(pack.NewBytes32([32]byte{})),
 		reflect.TypeOf(pack.NewBytes65([65]byte{})),
+		reflect.TypeOf(pack.NewBytes64([64]byte{})),
 	}
 
 	for _, t := range ts {
@@ -110,6 +111,23 @@ var _ = Describe("Bytes", func() {
 					err = json.Unmarshal(data, &b65)
 					Expect(err).To(HaveOccurred())
 					Expect(err.Error()).To(ContainSubstring("expected len=65"))
+					return true
+				}
+				Expect(quick.Check(f, nil)).To(Succeed())
+			})
+		})
+	})
+
+	Context("when unmarshaling a byte64 array", func() {
+		Context("when the string represents an array with a different length", func() {
+			It("should return an error", func() {
+				f := func(x [63]byte) bool {
+					data, err := json.Marshal(pack.NewBytes(x[:]))
+					Expect(err).ToNot(HaveOccurred())
+					b64 := pack.Bytes64{}
+					err = json.Unmarshal(data, &b64)
+					Expect(err).To(HaveOccurred())
+					Expect(err.Error()).To(ContainSubstring("expected len=64"))
 					return true
 				}
 				Expect(quick.Check(f, nil)).To(Succeed())
@@ -228,6 +246,33 @@ var _ = Describe("Bytes", func() {
 		})
 	})
 
+	Context("when comparing byte64 arrays", func() {
+		Context("when the byte64 arrays are equal", func() {
+			It("should return true", func() {
+				f := func(x [64]byte) bool {
+					other := pack.NewBytes64(x)
+					Expect(pack.NewBytes64(x).Equal(&other)).To(BeTrue())
+					return true
+				}
+				Expect(quick.Check(f, nil)).To(Succeed())
+			})
+		})
+
+		Context("when the byte64 arrays are not equal", func() {
+			It("should return true", func() {
+				f := func(x, y [64]byte) bool {
+					if bytes.Equal(x[:], y[:]) {
+						return true
+					}
+					other := pack.NewBytes64(y)
+					Expect(pack.NewBytes64(x).Equal(&other)).To(BeFalse())
+					return true
+				}
+				Expect(quick.Check(f, nil)).To(Succeed())
+			})
+		})
+	})
+
 	Context("when marshaling and unmarshaling byte slices to and from text", func() {
 		It("should return itself", func() {
 			f := func(x pack.Bytes) bool {
@@ -262,6 +307,20 @@ var _ = Describe("Bytes", func() {
 				data, err := x.MarshalText()
 				Expect(err).ToNot(HaveOccurred())
 				y := pack.Bytes65{}
+				err = y.UnmarshalText(data)
+				Expect(err).ToNot(HaveOccurred())
+				return x.Equal(&y)
+			}
+			Expect(quick.Check(f, nil)).To(Succeed())
+		})
+	})
+
+	Context("when marshaling and unmarshaling byte64 arrays to and from text", func() {
+		It("should return itself", func() {
+			f := func(x pack.Bytes64) bool {
+				data, err := x.MarshalText()
+				Expect(err).ToNot(HaveOccurred())
+				y := pack.Bytes64{}
 				err = y.UnmarshalText(data)
 				Expect(err).ToNot(HaveOccurred())
 				return x.Equal(&y)
@@ -330,6 +389,26 @@ var _ = Describe("Bytes", func() {
 		})
 	})
 
+	Context("when stringifying byte64 slices", func() {
+		It("should return raw URL base64 encodings", func() {
+			f := func(x [64]byte) bool {
+				Expect(pack.NewBytes64(x).String()).To(Equal(base64.RawURLEncoding.EncodeToString(x[:])))
+				return true
+			}
+			Expect(quick.Check(f, nil)).To(Succeed())
+		})
+	})
+
+	Context("when getting bytes from a byte64 array", func() {
+		It("should a copy of the underlying bytes", func() {
+			f := func(x [64]byte) bool {
+				Expect(bytes.Equal(pack.NewBytes64(x).Bytes(), x[:])).To(BeTrue())
+				return true
+			}
+			Expect(quick.Check(f, nil)).To(Succeed())
+		})
+	})
+
 	Context("when getting type information for strings", func() {
 		It("should return the string type", func() {
 			Expect(pack.NewString("").Type().Kind()).To(Equal(pack.KindString))
@@ -351,6 +430,12 @@ var _ = Describe("Bytes", func() {
 	Context("when getting type information for byte65 arrays", func() {
 		It("should return the 65-byte array type", func() {
 			Expect(pack.NewBytes65([65]byte{}).Type().Kind()).To(Equal(pack.KindBytes65))
+		})
+	})
+
+	Context("when getting type information for byte64 arrays", func() {
+		It("should return the 64-byte array type", func() {
+			Expect(pack.NewBytes64([64]byte{}).Type().Kind()).To(Equal(pack.KindBytes64))
 		})
 	})
 })

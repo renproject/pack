@@ -766,6 +766,73 @@ func (t *typeBytes65) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+type typeBytes64 struct{}
+
+func (typeBytes64) Kind() Kind {
+	return KindBytes64
+}
+
+func (t typeBytes64) Equals(other Type) bool {
+	_, ok := other.(typeBytes64)
+	return ok
+}
+
+func (typeBytes64) UnmarshalValue(buf []byte, rem int) (Value, []byte, int, error) {
+	value := Bytes64{}
+	buf, rem, err := value.Unmarshal(buf, rem)
+	return value, buf, rem, err
+}
+
+func (typeBytes64) UnmarshalValueJSON(data []byte) (Value, error) {
+	value := Bytes64{}
+	err := value.UnmarshalJSON(data)
+	return value, err
+}
+
+func (t typeBytes64) SizeHint() int {
+	return t.Kind().SizeHint()
+}
+
+func (t typeBytes64) Marshal(buf []byte, rem int) ([]byte, int, error) {
+	return t.Kind().Marshal(buf, rem)
+}
+
+func (t *typeBytes64) Unmarshal(buf []byte, rem int) ([]byte, int, error) {
+	var kind Kind
+	var err error
+	buf, rem, err = kind.Unmarshal(buf, rem)
+	if err != nil {
+		return buf, rem, err
+	}
+	if kind != t.Kind() {
+		return buf, rem, fmt.Errorf("unexpected kind: expected %v, got %v", t.Kind(), kind)
+	}
+	return buf, rem, nil
+}
+
+func (t typeBytes64) MarshalJSON() ([]byte, error) {
+	data, err := t.Kind().MarshalText()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(string(data))
+}
+
+func (t *typeBytes64) UnmarshalJSON(data []byte) error {
+	var text string
+	if err := json.Unmarshal(data, &text); err != nil {
+		return err
+	}
+	var kind Kind
+	if err := kind.UnmarshalText([]byte(text)); err != nil {
+		return err
+	}
+	if kind != t.Kind() {
+		return fmt.Errorf("unexpected kind: expected %v, got %v", t.Kind(), kind)
+	}
+	return nil
+}
+
 type typeStructField struct {
 	Name string
 	Type Type
@@ -1073,6 +1140,8 @@ func SizeHintType(t Type) int {
 		return t.SizeHint()
 	case KindBytes65:
 		return t.SizeHint()
+	case KindBytes64:
+		return t.SizeHint()
 	case KindStruct, KindList:
 		return t.Kind().SizeHint() + t.SizeHint()
 	default:
@@ -1104,6 +1173,8 @@ func MarshalType(t Type, buf []byte, rem int) ([]byte, int, error) {
 	case KindBytes32:
 		return t.Marshal(buf, rem)
 	case KindBytes65:
+		return t.Marshal(buf, rem)
+	case KindBytes64:
 		return t.Marshal(buf, rem)
 	case KindStruct, KindList:
 		var err error
@@ -1159,6 +1230,9 @@ func UnmarshalType(t *Type, buf []byte, rem int) ([]byte, int, error) {
 		return buf, rem, nil
 	case KindBytes65:
 		*t = typeBytes65{}
+		return buf, rem, nil
+	case KindBytes64:
+		*t = typeBytes64{}
 		return buf, rem, nil
 	case KindStruct:
 		ts := typeStruct{}
@@ -1228,6 +1302,8 @@ func unmarshalTypeJSON(data []byte) (Type, error) {
 			return typeBytes32{}, nil
 		case KindBytes65:
 			return typeBytes65{}, nil
+		case KindBytes64:
+			return typeBytes64{}, nil
 		default:
 			return nil, fmt.Errorf("unexpected kind %v", kind)
 		}

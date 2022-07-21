@@ -52,6 +52,8 @@ func GenerateFromKind(r *rand.Rand, size int, kind Kind, allowStruct, allowList 
 		t = reflect.TypeOf(Bytes32{})
 	case KindBytes65:
 		t = reflect.TypeOf(Bytes65{})
+	case KindBytes64:
+		t = reflect.TypeOf(Bytes64{})
 	case KindStruct:
 		if !allowStruct {
 			return Generate(r, size, allowStruct, allowList)

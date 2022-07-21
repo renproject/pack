@@ -31,6 +31,7 @@ var _ = Describe("Types", func() {
 		reflect.TypeOf(pack.NewBytes([]byte{}).Type()),
 		reflect.TypeOf(pack.NewBytes32([32]byte{}).Type()),
 		reflect.TypeOf(pack.NewBytes65([65]byte{}).Type()),
+		reflect.TypeOf(pack.NewBytes64([64]byte{}).Type()),
 		reflect.TypeOf(pack.NewStruct(
 			"foo", pack.NewU32(0),
 			"bar", pack.NewString(""),
