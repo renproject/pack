@@ -28,6 +28,7 @@ var _ = Describe("Encoding", func() {
 		reflect.TypeOf(pack.Bytes{}),
 		reflect.TypeOf(pack.Bytes32{}),
 		reflect.TypeOf(pack.Bytes65{}),
+		reflect.TypeOf(pack.Bytes64{}),
 		reflect.TypeOf(pack.Struct{}),
 		reflect.TypeOf(pack.List{}),
 
@@ -41,6 +42,7 @@ var _ = Describe("Encoding", func() {
 		reflect.TypeOf([]byte{}),
 		reflect.TypeOf([32]byte{}),
 		reflect.TypeOf([65]byte{}),
+		reflect.TypeOf([64]byte{}),
 		reflect.TypeOf(struct{}{}),
 		reflect.TypeOf([]string{}),
 		reflect.TypeOf([]uint64{}),
@@ -55,6 +57,7 @@ var _ = Describe("Encoding", func() {
 			Bar []byte   `json:"bar"`
 			Baz [32]byte `json:"baz"`
 			Boo [65]byte `json:"boo"`
+			Faz [64]byte `json:"faz"`
 
 			Inner struct {
 				InnerX       uint8  `json:"x"`
@@ -80,6 +83,7 @@ var _ = Describe("Encoding", func() {
 			Bar pack.Bytes   `json:"bar"`
 			Baz pack.Bytes32 `json:"baz"`
 			Boo pack.Bytes65 `json:"boo"`
+			Faz pack.Bytes64 `json:"faz"`
 
 			Inner struct {
 				InnerX       pack.U64 `json:"x"`

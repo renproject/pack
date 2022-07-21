@@ -40,6 +40,8 @@ func Encode(v interface{}) (val Value, err error) {
 		return v, nil
 	case Bytes65:
 		return v, nil
+	case Bytes64:
+		return v, nil
 	case Struct:
 		return v, nil
 	case List:
@@ -205,6 +207,12 @@ func Decode(interf interface{}, v Value) (err error) {
 		return fmt.Errorf("unexpected value of type %T", v)
 	case *Bytes65:
 		if v, ok := v.(Bytes65); ok {
+			*interf = v
+			return nil
+		}
+		return fmt.Errorf("unexpected value of type %T", v)
+	case *Bytes64:
+		if v, ok := v.(Bytes64); ok {
 			*interf = v
 			return nil
 		}

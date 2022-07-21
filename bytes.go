@@ -379,3 +379,108 @@ func (Bytes65) Generate(r *rand.Rand, size int) reflect.Value {
 	v, _ := quick.Value(reflect.TypeOf([65]byte{}), r)
 	return reflect.ValueOf(NewBytes65(v.Interface().([65]byte)))
 }
+
+// Bytes64 represents a static-sized 64-byte array.
+type Bytes64 [64]byte
+
+// NewBytes64 wraps an existing raw 64-byte array.
+func NewBytes64(x [64]byte) Bytes64 {
+	return Bytes64(x)
+}
+
+// Type returns the 64-byte array type.
+func (Bytes64) Type() Type {
+	return typeBytes64{}
+}
+
+// Bytes returns a copy of the byte array as a dynamic byte slice.
+func (x Bytes64) Bytes() []byte {
+	copied := x
+	return copied[:]
+}
+
+// Equal returns true when x is equal to y. Otherwise, it returns false.
+func (x Bytes64) Equal(y *Bytes64) bool {
+	return bytes.Equal(x[:], y[:])
+}
+
+// SizeHint returns the number of bytes required to represent the 64-byte array
+// in binary.
+func (x Bytes64) SizeHint() int {
+	return 64
+}
+
+// Marshal the 64-byte array to binary.
+func (x Bytes64) Marshal(buf []byte, rem int) ([]byte, int, error) {
+	if len(buf) < 64 || rem < 64 {
+		return buf, rem, surge.ErrUnexpectedEndOfBuffer
+	}
+	copy(buf, x[:])
+	return buf[64:], rem - 64, nil
+}
+
+// Unmarshal the 64-byte array from binary.
+func (x *Bytes64) Unmarshal(buf []byte, rem int) ([]byte, int, error) {
+	if len(buf) < 64 || rem < 64 {
+		return buf, rem, surge.ErrUnexpectedEndOfBuffer
+	}
+	copy(x[:], buf[:64])
+	return buf[64:], rem - 64, nil
+}
+
+// MarshalJSON marshals the 64-byte array to JSON. This is done by encoding the
+// bytes into a base64 raw URL encoded string.
+func (x Bytes64) MarshalJSON() ([]byte, error) {
+	return json.Marshal(base64.RawURLEncoding.EncodeToString(x[:]))
+}
+
+// UnmarshalJSON unmarshals the 64-byte array from JSON. This is done by
+// decoding the bytes from a base64 raw URL encoded string.
+func (x *Bytes64) UnmarshalJSON(data []byte) error {
+	var str string
+	if err := json.Unmarshal(data, &str); err != nil {
+		return err
+	}
+	data, err := base64.RawURLEncoding.DecodeString(str)
+	if err != nil {
+		return err
+	}
+	if len(data) != 64 {
+		return fmt.Errorf("expected len=64, got len=%v", len(data))
+	}
+	copy(x[:], data)
+	return nil
+}
+
+// MarshalText marshals the 64-byte array to text. This is done by encoding the
+// bytes into a base64 raw URL encoded string.
+func (x Bytes64) MarshalText() ([]byte, error) {
+	return []byte(base64.RawURLEncoding.EncodeToString(x[:])), nil
+}
+
+// UnmarshalText unmarshals the 64-byte array from text. This is done by decoding the
+// bytes from a base64 raw URL encoded string.
+func (x *Bytes64) UnmarshalText(text []byte) error {
+	data, err := base64.RawURLEncoding.DecodeString(string(text))
+	if err != nil {
+		return err
+	}
+	if len(data) != 64 {
+		return fmt.Errorf("expected len=64, got len=%v", len(data))
+	}
+	copy(x[:], data)
+	return nil
+}
+
+// String returns a base64 raw URL encoding of the bytes.
+func (x Bytes64) String() string {
+	return base64.RawURLEncoding.EncodeToString(x[:])
+}
+
+// Generate a random 64-byte array. This method is implemented for use in quick
+// tests. See https://golang.org/pkg/testing/quick/#Generator for more
+// information.
+func (Bytes64) Generate(r *rand.Rand, size int) reflect.Value {
+	v, _ := quick.Value(reflect.TypeOf([64]byte{}), r)
+	return reflect.ValueOf(NewBytes64(v.Interface().([64]byte)))
+}

@@ -43,6 +43,8 @@ const (
 	KindBytes32 = Kind(12)
 	// KindBytes65 is the kind of all 65-byte arrays.
 	KindBytes65 = Kind(13)
+	// KindBytes65 is the kind of all 64-byte arrays.
+	KindBytes64 = Kind(14)
 
 	// KindStruct is the kind of all struct values. It is abstract, because it does
 	// not specify the fields in the struct.

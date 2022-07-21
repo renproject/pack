@@ -22,6 +22,7 @@ var _ = Describe("Value", func() {
 				func(v pack.Value) {}(new(pack.Bytes))
 				func(v pack.Value) {}(new(pack.Bytes32))
 				func(v pack.Value) {}(new(pack.Bytes65))
+				func(v pack.Value) {}(new(pack.Bytes64))
 				func(v pack.Value) {}(new(pack.Struct))
 			}).ToNot(Panic())
 		})

@@ -17,7 +17,7 @@ var _ = Describe("Kind", func() {
 
 	randomKind := func() pack.Kind {
 		r := rand.New(rand.NewSource(GinkgoRandomSeed()))
-		switch r.Int() % 13 {
+		switch r.Int() % 14 {
 		// Nil
 		case 0:
 			return pack.KindNil
@@ -43,10 +43,12 @@ var _ = Describe("Kind", func() {
 			return pack.KindBytes32
 		case 10:
 			return pack.KindBytes65
-		// Abstract
 		case 11:
-			return pack.KindStruct
+			return pack.KindBytes64
+		// Abstract
 		case 12:
+			return pack.KindStruct
+		case 13:
 			return pack.KindList
 		}
 		panic("unreachable")
