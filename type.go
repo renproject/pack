@@ -1140,6 +1140,8 @@ func SizeHintType(t Type) int {
 		return t.SizeHint()
 	case KindBytes65:
 		return t.SizeHint()
+	case KindBytes64:
+		return t.SizeHint()
 	case KindStruct, KindList:
 		return t.Kind().SizeHint() + t.SizeHint()
 	default:
@@ -1171,6 +1173,8 @@ func MarshalType(t Type, buf []byte, rem int) ([]byte, int, error) {
 	case KindBytes32:
 		return t.Marshal(buf, rem)
 	case KindBytes65:
+		return t.Marshal(buf, rem)
+	case KindBytes64:
 		return t.Marshal(buf, rem)
 	case KindStruct, KindList:
 		var err error
@@ -1226,6 +1230,9 @@ func UnmarshalType(t *Type, buf []byte, rem int) ([]byte, int, error) {
 		return buf, rem, nil
 	case KindBytes65:
 		*t = typeBytes65{}
+		return buf, rem, nil
+	case KindBytes64:
+		*t = typeBytes64{}
 		return buf, rem, nil
 	case KindStruct:
 		ts := typeStruct{}
@@ -1295,6 +1302,8 @@ func unmarshalTypeJSON(data []byte) (Type, error) {
 			return typeBytes32{}, nil
 		case KindBytes65:
 			return typeBytes65{}, nil
+		case KindBytes64:
+			return typeBytes64{}, nil
 		default:
 			return nil, fmt.Errorf("unexpected kind %v", kind)
 		}

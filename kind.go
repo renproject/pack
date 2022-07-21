@@ -81,6 +81,8 @@ func (kind Kind) String() string {
 		return "bytes32"
 	case KindBytes65:
 		return "bytes65"
+	case KindBytes64:
+		return "bytes64"
 
 	// Abstract
 	case KindStruct:
@@ -151,6 +153,9 @@ func (kind *Kind) UnmarshalText(text []byte) error {
 	case KindBytes65.String():
 		*kind = KindBytes65
 		return nil
+	case KindBytes64.String():
+		*kind = KindBytes64
+		return nil
 	case KindStruct.String():
 		*kind = KindStruct
 		return nil
@@ -190,8 +195,10 @@ func (kind Kind) Generate(r *rand.Rand, size int) reflect.Value {
 	case 10:
 		return reflect.ValueOf(KindBytes65)
 	case 11:
-		return reflect.ValueOf(KindStruct)
+		return reflect.ValueOf(KindBytes65)
 	case 12:
+		return reflect.ValueOf(KindStruct)
+	case 13:
 		return reflect.ValueOf(KindList)
 	default:
 		// It is intentional that this case never happens.
